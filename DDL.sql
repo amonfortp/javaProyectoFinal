@@ -5,17 +5,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
 -- Schema bbddProyecto
 -- -----------------------------------------------------
+DROP DATABASE IF EXISTS bbddProyecto;
+CREATE SCHEMA IF NOT EXISTS bbddProyecto DEFAULT CHARACTER SET utf8 ;
+USE bbddProyecto ;
 
 -- -----------------------------------------------------
--- Schema bbddProyecto
+-- CREAR USUARIO PARA LA BASE DE DATOS
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `bbddProyecto` DEFAULT CHARACTER SET utf8 ;
-USE `bbddProyecto` ;
+DROP USER IF EXISTS 'amonfortp1'@'%';
+CREATE USER 'amonfortp1'@'%';
+GRANT ALL PRIVILEGES ON bbddJava.* TO 'amonfortp1'@'%' IDENTIFIED BY '1111';
+GRANT all PRIVILEGES on mysql.proc TO 'amonfortp1'@'%' IDENTIFIED BY '1111';
 
 -- -----------------------------------------------------
 -- Table `bbddProyecto`.`Alumno`
@@ -108,6 +110,11 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 -- -----------------------------------------------------
+-- TRIGGER
+-- -----------------------------------------------------
+
+
+-- -----------------------------------------------------
 -- Procedimientos
 -- -----------------------------------------------------
 DELIMITER @@
@@ -116,18 +123,84 @@ CREATE PROCEDURE crearReservas(in id INT)
 BEGIN
 
     DECLARE existePeriodo INT DEFAULT 0;
-    DECLARE dia DATE;
-    DECLARE HORA TIME;
+    DECLARE diaAux DATE
+    DECLARE diaFin DATE;
+    DECLARE horaAux TIME;
+    DECLARE horaFin TIME;
+    DECLARE tiempo TIME;
 
-    SELECT COUNT(*) INTO existePeriodo FROM Periodo WHERE idPeriodo=id;
-	/*
-    IF existePeriodo = 1
+    SELECT COUNT(idPeriodo), diaInicio, diaFinal, horaInicio, horaFinal, tiempo INTO existePeriodo, diaAux,diaFin, horaAux, horaFin, tiempo FROM Periodo WHERE idPeriodo=id;
+    
+IF existePeriodo = 1
     THEN
-        
+        dia: LOOP
+            IF diaAux < diaFin
+                INSERT INTO Reserva (dia, hora, idPeriodo) VALUES (diaAux, horaAux, id);
+                DATEADD(day, 1, diaAux);
+                ITERATE dia;
+            END IF;
+            LEAVE dia;
+        END LOOP dia;
     END IF;
-    */
+    
+                -- hora: LOOP
+                   --    IF horaAux < horaFin
+
+                     --       ITERATE hora;
+                     --  END IF;
+                  --  LEAVE hora
+               -- END LOOP hora;
+
 END @@
 DELIMITER ;
+
+DELIMITER @@
+DROP PROCEDURE IF EXISTS crearReservas @@
+CREATE PROCEDURE crearReservas(in id INT)
+BEGIN
+
+    DECLARE existePeriodo INT DEFAULT 0;
+    DECLARE diaAux DATE
+    DECLARE diaFin DATE;
+    DECLARE horaAux TIME;
+    DECLARE horaFin TIME;
+    DECLARE tiempo TIME;
+
+    SELECT COUNT(idPeriodo), diaInicio, diaFinal, horaInicio, horaFinal, tiempo INTO existePeriodo, diaAux,diaFin, horaAux, horaFin, tiempo FROM Periodo WHERE idPeriodo=id;
+    
+IF existePeriodo = 1
+    THEN
+        dia: LOOP
+            IF diaAux < diaFin
+                INSERT INTO Reserva (dia, hora, idPeriodo) VALUES (diaAux, horaAux, id);
+                DATEADD(day, 1, diaAux);
+                ITERATE dia;
+            END IF;
+            LEAVE dia;
+        END LOOP dia;
+    END IF;
+    
+                -- hora: LOOP
+                   --    IF horaAux < horaFin
+
+                     --       ITERATE hora;
+                     --  END IF;
+                  --  LEAVE hora
+               -- END LOOP hora;
+
+END @@
+DELIMITER ;
+
+
+SET fecha_aux = fecha_inicio;
+label1: LOOP
+
+
+    IF fecha_aux < fecha_final THEN
+      ITERATE label1;
+    END IF;
+    LEAVE label1;
+  END LOOP label1;
 
 
 
