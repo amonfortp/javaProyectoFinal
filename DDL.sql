@@ -32,9 +32,9 @@ GRANT all PRIVILEGES on mysql.proc TO 'amonfortp1'@'%' IDENTIFIED BY '1111';
 CREATE TABLE IF NOT EXISTS `bbddProyecto`.`Alumno` (
   `email` VARCHAR(45) NOT NULL,
   `nombre` VARCHAR(45) NOT NULL,
-  `apellidos` VARCHAR(45) NOT NULL,
-  `login` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `apellido1` VARCHAR(45) NOT NULL,
+  `apellido2` VARCHAR(45),
+  `password` BLOB NOT NULL,
   PRIMARY KEY (`email`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -55,7 +55,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `bbddProyecto`.`Mensaje` (
   `tipo` VARCHAR(45) NOT NULL,
-  `mensaje` VARCHAR(50) NOT NULL,
+  `mensaje` VARCHAR(150) NOT NULL,
   PRIMARY KEY (`tipo`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `bbddProyecto`.`Periodo` (
   `horaFinal` TIME NOT NULL,
   `tiempo` TIME NOT NULL,
   `curso` YEAR NOT NULL,
+  `habilitado` TINYINT(1) NOT NULL,
   PRIMARY KEY (`idPeriodo`),
   UNIQUE INDEX `diaInicio` (`diaInicio` ASC, `diaFinal` ASC, `horaInicio` ASC, `horaFinal` ASC, `curso` ASC),
   INDEX `fk_Periodo_1_idx` (`curso` ASC),
@@ -145,9 +146,119 @@ END@@
 DELIMITER ;
 */
 
+
+DELIMITER @@
+DROP PROCEDURE IF EXISTS anularReserva @@
+CREATE PROCEDURE anularReserva(in correo VARCHAR(45))
+BEGIN
+
+	DECLARE diaR DATE;
+    DECLARE horaR TIME;
+    
+    
+
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		SHOW ERRORS LIMIT 1;      
+		RESIGNAL;   
+		ROLLBACK;
+	END;
+	
+SELECT 
+    dia, hora
+INTO diaR , horaR FROM
+    Reserva
+WHERE
+    email = correo;
+    
+	IF diaR = null
+	THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'No tiene ninguna reserva', MYSQL_ERRNO = 1001;
+	END IF;
+	IF current_date() < adddate(diaR, interval 1 day) and current_time()<horaR
+	THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'No se puede eliminar la reserva cuando quedan menos de 24h para el dia', MYSQL_ERRNO = 1002;
+	END IF;
+        
+	START TRANSACTION;
+		
+		UPDATE Reserva 
+		SET 
+			email = NULL
+		WHERE
+			dia = diaR AND hora = horaR;
+        
+	COMMIT;
+	
+END@@
+
+DELIMITER ;
+
+
+
+DELIMITER @@
+DROP PROCEDURE IF EXISTS reservar @@
+CREATE PROCEDURE reservar(in correo varchar(45), in diaR DATE, in horaR TIME)
+BEGIN
+
+	DECLARE reser INT DEFAULT 0;
+
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		SHOW ERRORS LIMIT 1;      
+		RESIGNAL;   
+		ROLLBACK;
+	END;
+		
+	SELECT 
+		COUNT(dia)
+	INTO reser FROM
+		Reserva
+	WHERE
+		email = correo;
+		
+	
+		IF reser = 1
+	THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Ya hay una reserva', MYSQL_ERRNO = 1001;
+	END IF;
+    
+    SET reser = 0;
+    
+	SELECT 
+		count(dia)
+	INTO reser FROM
+		Reserva
+	WHERE
+		dia = diaR AND hora = horaR;
+    
+    IF reser = 0
+    THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'No existe el dia para reservar', MYSQL_ERRNO = 1002;
+    END IF;
+    
+	START TRANSACTION;
+		
+		UPDATE Reserva 
+		SET 
+			email = correo
+		WHERE
+			dia = diaR AND hora = horaR;
+
+	COMMIT;
+	
+END@@
+
+DELIMITER ;
+
+
 DELIMITER @@
 DROP PROCEDURE IF EXISTS crearPeriodo @@
-CREATE PROCEDURE crearPeriodo(in diaInicio DATE, in diaFinal DATE, in horaInicio TIME, in horaFinal TIME, in tiempo TIME, in idCurso YEAR)
+CREATE PROCEDURE crearPeriodo(in diaInicio DATE, in diaFinal DATE, in horaInicio TIME, in horaFinal TIME, in tiempo TIME, in idCurso YEAR, in enabled TINYINT(1))
 BEGIN
   
 	DECLARE id INT;
@@ -159,39 +270,40 @@ BEGIN
       ROLLBACK;
     END;
     
-    SELECT ifnull(MAX(idPeriodo),0)+1
-	INTO id 
-    FROM Periodo;
+SELECT 
+    IFNULL(MAX(idPeriodo), 0) + 1
+INTO id FROM
+    Periodo;
 		
 	IF diaInicio > diaFinal
 	THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'El dia inicial no puede ser mayor que el dia final', MYSQL_ERRNO = 1000;
+		SET MESSAGE_TEXT = 'El dia inicial no puede ser mayor que el dia final', MYSQL_ERRNO = 1001;
 	END IF; 
     IF horaInicio > horaFinal
     THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'El hora inicial no puede ser mayor que la hora final', MYSQL_ERRNO = 1001;
+		SET MESSAGE_TEXT = 'El hora inicial no puede ser mayor que la hora final', MYSQL_ERRNO = 1002;
 	END IF; 
-    IF diaInicio > current_date() and horaInicio > current_time()
+    IF diaInicio < Adddate(current_date(), INTERVAL 1 DAY)
     THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'El dia y la hora inicial no puede ser menor que el actual', MYSQL_ERRNO = 1003;
 	END IF; 
-    IF tiempo >= '00:05:00'
-    THEN
-		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'El tiempo debe ser mayor o igual a 5 minutos', MYSQL_ERRNO = 1004;
-	END IF; 
-    IF idCurso >= year(current_date())
+    IF tiempo <= '00:05:00'
     THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'El tiempo debe ser mayor o igual a 5 minutos', MYSQL_ERRNO = 1005;
+	END IF; 
+    IF idCurso <= year(current_date())
+    THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'El curso no puede ser anterior al actual', MYSQL_ERRNO = 1006;
     END IF; 
 		
 	START TRANSACTION;
 
-		INSERT INTO Periodo (idPeriodo,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, curso) VALUES (id,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, idCurso);
+		INSERT INTO Periodo (idPeriodo,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, curso, habilitado) VALUES (id,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, idCurso, enabled);
 		
 		CALL crearReservas(id);           
 
@@ -270,3 +382,11 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
+INSERT INTO Curso VALUES (2020);
+
+CALL crearPeriodo('2020-05-12', '2020-05-15', '12:30:00', '15:30:00', '00:30:00', 2020, TRUE);
+
+INSERT INTO Alumno VALUES ('amonfortp1@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
+
+INSERT INTO Mensaje VALUES ('mensajeUsuarioCreado', 'Su usuario se a creado correctemente, su login y contraseña son: ');
+INSERT INTO Mensaje VALUES ('mensajeReservado', 'Ha realizado una reserva, a continuación vera un documento que debera guardar como confirmación y tiene un plazo de 24h para eliminarla.');
