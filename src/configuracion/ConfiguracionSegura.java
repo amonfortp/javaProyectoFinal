@@ -18,7 +18,8 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
  * 
  * Explicacion de la clase
  *
- * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra </a>
+ * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
+ *         </a>
  * 
  */
 
@@ -42,6 +43,16 @@ public class ConfiguracionSegura {
 	private String servername;
 	private String shema_base;
 
+	// Propiedades para GMAIL
+	private String mailSmtpReply;
+	private String mailFrom;
+	private String mailClientId;
+	private String mailClientSecret;
+	private String mailAccessToken;
+	private String mailRefreshToken;
+	private String applicationName;
+	private String nameFrom;
+
 	/**
 	 * Genera un objeto para el almacenaje de propiedades, utilizando el fichero
 	 * default.config.properties
@@ -51,6 +62,10 @@ public class ConfiguracionSegura {
 		propiedadesSeguras = new HashMap<String, String>();
 		propiedadesSeguras.put("password", "is.password.encripted");
 		propiedadesSeguras.put("ldapPassword", "is.ldapPassword.encrypted");
+		propiedadesSeguras.put("mailClientId", "is.mailClientId.encrypted");
+		propiedadesSeguras.put("mailClientSecret", "is.mailClientSecret.encrypted");
+		propiedadesSeguras.put("mailAccessToken", "is.mailAccessToken.encrypted");
+		propiedadesSeguras.put("mailRefreshToken", "is.mailRefreshToken.encrypted");
 
 		prop = new LinkedProperties();
 		OutputStream output = null;
@@ -73,9 +88,23 @@ public class ConfiguracionSegura {
 				// Propiedades para LDAP
 				prop.setProperty("ldapUsername", "cn=admin,dc=ieslavereda,dc=local");
 				prop.setProperty("ldapPassword", "passwordForLDAP");
-				prop.setProperty("is.ldapPassword.encrypted", "false");
 				prop.setProperty("servername", "ldap://10.0.0.243:389");
 				prop.setProperty("shema_base", "dc=ieslavereda,dc=local");
+				prop.setProperty("is.ldapPassword.encrypted", "false");
+
+				// Propiedades para GMAIL
+				prop.setProperty("mail.smtp.reply", "no reply");
+				prop.setProperty("mail.from", "amonfortp1@ieslavereda.es");
+				prop.setProperty("nameFrom", "Alejandro");
+				prop.setProperty("mailClientId", "mailClientId");
+				prop.setProperty("mailClientSecret", "mailClientSecret");
+				prop.setProperty("mailAccessToken", "mailAccessToken");
+				prop.setProperty("mailRefreshToken", "mailRefreshToken");
+				prop.setProperty("applicationName", "ProyectoReservasCitas");
+				prop.setProperty("is.mailClientId.encrypted", "false");
+				prop.setProperty("is.mailClientSecret.encrypted", "false");
+				prop.setProperty("is.mailAccessToken.encrypted", "false");
+				prop.setProperty("is.mailRefreshToken.encrypted", "false");
 
 				// save properties to project root folder
 				prop.store(output, null);
@@ -127,6 +156,16 @@ public class ConfiguracionSegura {
 				prop.setProperty("servername", servername);
 				prop.setProperty("shema_base", shema_base);
 
+				// Propiedades para GMAIL
+				prop.setProperty("mail.smtp.reply", mailSmtpReply);
+				prop.setProperty("mail.from", mailFrom);
+				prop.setProperty("nameFrom", nameFrom);
+				prop.setProperty("mailClientId", encrypt(mailClientId));
+				prop.setProperty("mailClientSecret", encrypt(mailClientSecret));
+				prop.setProperty("mailAccessToken", encrypt(mailAccessToken));
+				prop.setProperty("mailRefreshToken", encrypt(mailRefreshToken));
+				prop.setProperty("applicationName", applicationName);
+
 				// save properties to project root folder
 				prop.store(output, null);
 
@@ -177,19 +216,25 @@ public class ConfiguracionSegura {
 			this.host = prop.getProperty("host");
 			this.port = prop.getProperty("port");
 			this.user = prop.getProperty("user");
-
 			this.password = decryptPropertyValue("password");
-
 			this.database = prop.getProperty("database");
 
 			// Obtener propiedades de LDAP
 			this.ldapUsername = prop.getProperty("ldapUsername");
-
 			this.ldapPassword = decryptPropertyValue("ldapPassword");
-
 			this.servername = prop.getProperty("servername");
 			this.shema_base = prop.getProperty("shema_base");
 
+			// Obtener propiedades de GMAIL
+			this.mailSmtpReply = prop.getProperty("mail.smtp.reply");
+			this.mailFrom = prop.getProperty("mail.from");
+			this.mailClientId = decryptPropertyValue("mailClientId");
+			this.mailClientSecret = decryptPropertyValue("mailClientSecret");
+			this.mailAccessToken = decryptPropertyValue("mailAccessToken");
+			this.mailRefreshToken = decryptPropertyValue("mailRefreshToken");
+			this.applicationName = prop.getProperty("applicationName");
+			this.nameFrom = prop.getProperty("nameFrom");
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -373,4 +418,117 @@ public class ConfiguracionSegura {
 	public void setShema_base(String shema_base) {
 		this.shema_base = shema_base;
 	}
+
+	/**
+	 * @return the mailSmtpReply
+	 */
+	public String getMailSmtpReply() {
+		return mailSmtpReply;
+	}
+
+	/**
+	 * @param mailSmtpReply the mailSmtpReply to set
+	 */
+	public void setMailSmtpReply(String mailSmtpReply) {
+		this.mailSmtpReply = mailSmtpReply;
+	}
+
+	/**
+	 * @return the mailFrom
+	 */
+	public String getMailFrom() {
+		return mailFrom;
+	}
+
+	/**
+	 * @param mailFrom the mailFrom to set
+	 */
+	public void setMailFrom(String mailFrom) {
+		this.mailFrom = mailFrom;
+	}
+
+	/**
+	 * @return the mailClientId
+	 */
+	public String getMailClientId() {
+		return mailClientId;
+	}
+
+	/**
+	 * @param mailClientId the mailClientId to set
+	 */
+	public void setMailClientId(String mailClientId) {
+		this.mailClientId = mailClientId;
+	}
+
+	/**
+	 * @return the mailClientSecret
+	 */
+	public String getMailClientSecret() {
+		return mailClientSecret;
+	}
+
+	/**
+	 * @param mailClientSecret the mailClientSecret to set
+	 */
+	public void setMailClientSecret(String mailClientSecret) {
+		this.mailClientSecret = mailClientSecret;
+	}
+
+	/**
+	 * @return the mailAccessToken
+	 */
+	public String getMailAccessToken() {
+		return mailAccessToken;
+	}
+
+	/**
+	 * @param mailAccessToken the mailAccessToken to set
+	 */
+	public void setMailAccessToken(String mailAccessToken) {
+		this.mailAccessToken = mailAccessToken;
+	}
+
+	/**
+	 * @return the mailRefreshToken
+	 */
+	public String getMailRefreshToken() {
+		return mailRefreshToken;
+	}
+
+	/**
+	 * @param mailRefreshToken the mailRefreshToken to set
+	 */
+	public void setMailRefreshToken(String mailRefreshToken) {
+		this.mailRefreshToken = mailRefreshToken;
+	}
+
+	/**
+	 * @return the applicationName
+	 */
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	/**
+	 * @param applicationName the applicationName to set
+	 */
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
+
+	/**
+	 * @return the nameFrom
+	 */
+	public String getNameFrom() {
+		return nameFrom;
+	}
+
+	/**
+	 * @param nameFrom the nameFrom to set
+	 */
+	public void setNameFrom(String nameFrom) {
+		this.nameFrom = nameFrom;
+	}
+
 }

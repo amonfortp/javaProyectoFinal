@@ -1,4 +1,4 @@
-package configuracion;
+package modeloLDAP;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -18,9 +18,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
-import modeloLDAP.AlumnoLDAP;
-import modeloLDAP.Persona;
-import modeloLDAP.Profesor;
+import configuracion.ConfiguracionSegura;
 
 public class LDAP {
 

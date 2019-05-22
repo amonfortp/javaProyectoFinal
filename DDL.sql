@@ -326,8 +326,7 @@ BEGIN
     DECLARE horaIni TIME;
     DECLARE horaFin TIME;
     DECLARE temp TIME;
-
-	DECLARE i INT DEFAULT 0;
+    
     DECLARE horaAux TIME;
     
 	-- SELECT PARA DAR VALOR A LAS VARIABLES
@@ -343,48 +342,47 @@ INTO existePeriodo , diaAux , diaFin , horaIni , horaFin , temp FROM
 WHERE
     idPeriodo = id;
 
-SET horaAux = horaIni;
-    
-IF existePeriodo = 1
-    THEN
-    
-    
-    -- BUCLE PARA LOS DIAS DE LAS RESERVAS
-        dia: LOOP
-            IF ADDDATE(diaAux, INTERVAL i DAY) <= diaFin
-            THEN
-             -- BUCLE PARA LAS HORAS DE LAS RESERVAS
-				 hora : LOOP
-					 IF horaAux <= horaFin
-					 THEN
-					-- INSERTO LAS RESERVAS
-						INSERT INTO Reserva (dia, hora, idPeriodo) VALUES (ADDDATE(diaAux, INTERVAL i DAY), horaAux, id);
-                        SET horaAux = ADDTIME(horaAux, temp);
-						ITERATE hora;
-					END IF;
-                    SET horaAux = horaIni;
-				 LEAVE hora;
-                 END LOOP hora;
-                SET i = i + 1;
-                ITERATE dia;
-            END IF;
-            LEAVE dia;
-        END LOOP dia;
-        
-    END IF;
+	SET horaAux = horaIni;
+		
+	IF existePeriodo = 1
+	THEN
 
+		dia: LOOP
+			IF DAYOFWEEK(diaAux) = 1
+			THEN
+				SET diaAux = ADDDATE(diaAux, INTERVAL 1 DAY);
+			ELSEIF DAYOFWEEK(diaAux) = 7
+			THEN
+				SET diaAux = ADDDATE(diaAux, INTERVAL 2 DAY);
+			ELSE
+				IF diaAux <= diaFin
+				THEN
+					hora: LOOP
+						IF horaAux <= horaFin
+						THEN
+							INSERT INTO Reserva (dia,hora,idPeriodo) VALUES(diaAux,horaAux,id);
+							SET horaAux = ADDTIME(horaAux, temp);
+							ITERATE hora;
+						ELSE
+							LEAVE hora;
+						END IF;
+					END LOOP hora;
+					SET horaAux = horaIni;
+					SET diaAux = ADDDATE(diaAux,INTERVAL 1 DAY);
+					ITERATE dia;
+				ELSE
+					LEAVE dia;
+				END IF;
+            END IF;
+		END LOOP dia;
+	END IF;
 END@@
 
 DELIMITER ;
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
 INSERT INTO Curso VALUES (2020);
 
-CALL crearPeriodo('2020-05-12', '2020-05-15', '12:30:00', '15:30:00', '00:30:00', 2020, TRUE);
+CALL crearPeriodo('2019-05-27', '2019-06-02', '12:30:00', '15:30:00', '00:30:00', 2020, TRUE);
 
 INSERT INTO Alumno VALUES ('amonfortp1@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
 
