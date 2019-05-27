@@ -30,6 +30,4 @@ public class Modelo extends Database {
 		super();
 	}
 
-	
-
 }

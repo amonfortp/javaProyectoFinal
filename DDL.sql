@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `bbddProyecto`.`Periodo` (
   `horaFinal` TIME NOT NULL,
   `tiempo` TIME NOT NULL,
   `curso` YEAR NOT NULL,
-  `habilitado` TINYINT(1) NOT NULL,
+  `habilitado` TINYINT(1) NOT NULL DEFAULT TRUE,
   PRIMARY KEY (`idPeriodo`),
   UNIQUE INDEX `diaInicio` (`diaInicio` ASC, `diaFinal` ASC, `horaInicio` ASC, `horaFinal` ASC, `curso` ASC),
   INDEX `fk_Periodo_1_idx` (`curso` ASC),
@@ -258,7 +258,7 @@ DELIMITER ;
 
 DELIMITER @@
 DROP PROCEDURE IF EXISTS crearPeriodo @@
-CREATE PROCEDURE crearPeriodo(in diaInicio DATE, in diaFinal DATE, in horaInicio TIME, in horaFinal TIME, in tiempo TIME, in idCurso YEAR, in enabled TINYINT(1))
+CREATE PROCEDURE crearPeriodo(in diaInicio DATE, in diaFinal DATE, in horaInicio TIME, in horaFinal TIME, in tiempo TIME, in idCurso YEAR)
 BEGIN
   
 	DECLARE id INT;
@@ -295,7 +295,7 @@ INTO id FROM
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'El tiempo debe ser mayor o igual a 5 minutos', MYSQL_ERRNO = 1005;
 	END IF; 
-    IF idCurso <= year(current_date())
+    IF idCurso < year(current_date())
     THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'El curso no puede ser anterior al actual', MYSQL_ERRNO = 1006;
@@ -303,7 +303,7 @@ INTO id FROM
 		
 	START TRANSACTION;
 
-		INSERT INTO Periodo (idPeriodo,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, curso, habilitado) VALUES (id,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, idCurso, enabled);
+		INSERT INTO Periodo (idPeriodo,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, curso) VALUES (id,diaInicio, diaFinal, horaInicio, horaFinal, tiempo, idCurso);
 		
 		CALL crearReservas(id);           
 
@@ -380,11 +380,14 @@ END@@
 
 DELIMITER ;
 
-INSERT INTO Curso VALUES (2020);
+INSERT INTO Curso VALUES (2019);
 
-CALL crearPeriodo('2019-05-27', '2019-06-02', '12:30:00', '15:30:00', '00:30:00', 2020, TRUE);
+CALL crearPeriodo('2019-07-01', '2019-07-15', '12:30:00', '15:30:00', '00:30:00', 2019);
 
 INSERT INTO Alumno VALUES ('amonfortp1@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
 
 INSERT INTO Mensaje VALUES ('mensajeUsuarioCreado', 'Su usuario se a creado correctemente, su login y contraseña son: ');
 INSERT INTO Mensaje VALUES ('mensajeReservado', 'Ha realizado una reserva, a continuación vera un documento que debera guardar como confirmación y tiene un plazo de 24h para eliminarla.');
+
+-- CALL reservar('amonfortp1@ieslavereda.es', '2019-07-01', '12:30:00');
+-- CALL anularReserva('amonfortp1@ieslavereda.es');

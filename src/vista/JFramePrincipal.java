@@ -21,7 +21,7 @@ public class JFramePrincipal extends JFrame {
 	public JButton btnLogin;
 	public JButton btnReservas;
 	public JButton btnPeriodos;
-	public JButton btnConfiguracin;
+	public JButton btnConfiguracion;
 	public JDesktopPane desktopPane;
 	public JButton btnSalir;
 
@@ -74,10 +74,10 @@ public class JFramePrincipal extends JFrame {
 		btnPeriodos.setIcon(new ImageIcon(JFramePrincipal.class.getResource("/images/categoria.png")));
 		toolBar.add(btnPeriodos);
 
-		btnConfiguracin = new JButton("Configuración");
-		btnConfiguracin.setEnabled(false);
-		btnConfiguracin.setIcon(new ImageIcon(JFramePrincipal.class.getResource("/images/Conf.png")));
-		toolBar.add(btnConfiguracin);
+		btnConfiguracion = new JButton("Configuración");
+		btnConfiguracion.setEnabled(false);
+		btnConfiguracion.setIcon(new ImageIcon(JFramePrincipal.class.getResource("/images/Conf.png")));
+		toolBar.add(btnConfiguracion);
 
 		btnSalir = new JButton("Salir");
 		btnSalir.setEnabled(false);

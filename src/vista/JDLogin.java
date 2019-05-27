@@ -23,7 +23,7 @@ public class JDLogin extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	public JButton btnAceptar;
 	public JButton btnCancelar;
-	public JTextField textField;
+	public JTextField textFieldLogin;
 	public JPasswordField passwordField;
 
 	/**
@@ -43,6 +43,7 @@ public class JDLogin extends JDialog {
 	 * Create the dialog.
 	 */
 	public JDLogin() {
+		setTitle("LOGIN");
 		setModal(true);
 		setBounds(100, 100, 535, 353);
 		getContentPane().setLayout(new BorderLayout());
@@ -67,9 +68,9 @@ public class JDLogin extends JDialog {
 				panel.add(lblUsuario, "cell 0 1,alignx left,aligny center");
 			}
 			{
-				textField = new JTextField();
-				panel.add(textField, "cell 0 2,growx,aligny top");
-				textField.setColumns(10);
+				textFieldLogin = new JTextField();
+				panel.add(textFieldLogin, "cell 0 2,growx,aligny top");
+				textFieldLogin.setColumns(10);
 			}
 			{
 				JLabel lblContrasea = new JLabel("Contraseña");

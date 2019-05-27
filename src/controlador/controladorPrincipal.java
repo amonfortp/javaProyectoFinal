@@ -7,11 +7,16 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 
 import modeloBBDD.Modelo;
+import modeloLDAP.LDAP;
+import modeloLDAP.Persona;
+import modeloLDAP.Profesor;
 import vista.JDLogin;
 import vista.JFramePrincipal;
 
@@ -48,7 +53,7 @@ public class controladorPrincipal implements ActionListener {
 	 * necesitemos
 	 * 
 	 */
-	public void iniciar() {
+	private void iniciar() {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		view.setTitle("Aplicacion Proyecto Final");
 		view.setMaximumSize(dim);
@@ -61,14 +66,19 @@ public class controladorPrincipal implements ActionListener {
 		view.btnLogin.setActionCommand("login");
 		view.btnReservas.setActionCommand("reservas");
 		view.btnPeriodos.setActionCommand("periodos");
-		view.btnConfiguracin.setActionCommand("configuracion");
+		view.btnConfiguracion.setActionCommand("configuracion");
 		view.btnSalir.setActionCommand("salir");
 
 		view.btnLogin.addActionListener(this);
 		view.btnReservas.addActionListener(this);
 		view.btnPeriodos.addActionListener(this);
-		view.btnConfiguracin.addActionListener(this);
+		view.btnConfiguracion.addActionListener(this);
 		view.btnSalir.addActionListener(this);
+
+		view.btnReservas.setVisible(false);
+		view.btnPeriodos.setVisible(false);
+		view.btnConfiguracion.setVisible(false);
+		view.btnSalir.setEnabled(false);
 	}
 
 	/**
@@ -80,16 +90,64 @@ public class controladorPrincipal implements ActionListener {
 		view.setVisible(true);
 	}
 
-	/**
-	 * 
-	 * Cargar JDLogin
-	 *
-	 */
-	public void cargarLogin() {
+	private void cargarLogin() {
 		login = new JDLogin();
-		controladorLogin cl = new controladorLogin(login, modelo);
-		cl.start();
+		login.btnAceptar.setActionCommand("aceptar login");
+		login.btnCancelar.setActionCommand("cancelar login");
 
+		login.btnAceptar.addActionListener(this);
+		login.btnCancelar.addActionListener(this);
+
+		login.setVisible(true);
+	}
+
+	private void comprobarInicio() {
+		String l = login.textFieldLogin.getText();
+		String p = String.valueOf(login.passwordField.getPassword());
+
+		if (comprobarLDAP(l, p)) {
+			view.btnPeriodos.setVisible(true);
+			view.btnConfiguracion.setVisible(true);
+			view.btnPeriodos.setEnabled(true);
+			view.btnConfiguracion.setEnabled(true);
+			view.btnSalir.setEnabled(true);
+			view.btnLogin.setVisible(false);
+			login.dispose();
+		} else if (comprobarBBDD(l, p)) {
+			view.btnReservas.setVisible(true);
+			view.btnReservas.setEnabled(true);
+			view.btnSalir.setEnabled(true);
+			view.btnLogin.setVisible(false);
+			login.dispose();
+		} else {
+			JOptionPane.showMessageDialog(view, "No existe el usuario, comprueba login o contraseña", "ERROR",
+					JOptionPane.ERROR_MESSAGE);
+			login.textFieldLogin.setText("");
+			login.passwordField.setText("");
+		}
+	}
+
+	private boolean comprobarLDAP(String login, String passwd) {
+		boolean b = false;
+		ArrayList<Persona> profesores = new ArrayList<Persona>();
+		LDAP ldap = new LDAP();
+		profesores = ldap.memberOf("Docente");
+
+		if (ldap.autenticacionLDAP(login, passwd)) {
+			for (int i = 0; i < profesores.size(); i++) {
+				if (ldap.obtenerUsuarioLDAPByUID(profesores.get(i))) {
+					b = true;
+				}
+			}
+		}
+
+		return b;
+	}
+
+	private boolean comprobarBBDD(String login, String passwd) {
+		boolean b = false;
+
+		return b;
 	}
 
 	private boolean estaAbierto(JInternalFrame jif) {
@@ -128,6 +186,10 @@ public class controladorPrincipal implements ActionListener {
 
 		} else if (comand.equals("salir")) {
 
+		} else if (comand.equals("aceptar login")) {
+			comprobarInicio();
+		} else if (comand.equals("cancelar login")) {
+			login.dispose();
 		}
 	}
 

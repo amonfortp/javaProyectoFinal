@@ -38,26 +38,22 @@ public class Database {
 
 		this.host = "127.0.0.1";
 		this.port = "3306";
-		this.database = "bbddJava";
+		this.database = "bbddProyecto";
 		this.user = "amonfortp1";
 		this.password = "1111";
 
 	}
 
 	public Connection conectar() {
-
 		conexion = null;
 		ConfiguracionSegura conf = new ConfiguracionSegura();
-
-		// System.out.println(conf.getUser());
-		// System.out.println(conf.getPassword());
 
 		try {
 			conexion = DriverManager.getConnection(
 					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database + "?serverTimezone=UTC",
 					conf.getUser(), conf.getPassword());
 			if (conexion != null) {
-				// System.out.println("Conexion realizada con exito");
+				System.out.println("Conexion realizada con exito");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -69,11 +65,18 @@ public class Database {
 	protected void desconectar() {
 		try {
 			conexion.close();
-			// System.out.println("Desconexion realizada con exito");
+			System.out.println("Se a desconectado");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	protected Map<Integer, ArrayList<Object>> select(String columnas, String tabla, String where) {
+		Map<Integer, ArrayList<Object>> resultado = new LinkedHashMap<Integer, ArrayList<Object>>();
+		
+		
+		
+		return resultado;
 	}
 
 }
