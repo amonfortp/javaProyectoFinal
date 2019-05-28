@@ -4,7 +4,7 @@
 package modeloBBDD;
 
 /**
- * Explicacion de la clase
+ * Objeto Alumno para almacenar un Alumno de la base de datos
  *
  * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
  *         </a>

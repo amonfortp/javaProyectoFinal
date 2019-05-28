@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import modeloBBDD.AlumnoBBDD;
 import modeloBBDD.Modelo;
 import modeloBBDD.Password;
 import modeloLDAP.LDAP;
@@ -62,9 +63,7 @@ public class controladorPrincipal implements ActionListener {
 		view.setMaximumSize(dim);
 		view.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		/*
-		 * Iniciar los botones del JFramePrincipal
-		 */
+		// Iniciar los botones del JFramePrincipal
 
 		view.btnLogin.setActionCommand("login");
 		view.btnReservas.setActionCommand("reservas");
@@ -184,13 +183,31 @@ public class controladorPrincipal implements ActionListener {
 	}
 
 	private void crearCuenta() {
+		String email;
+		String nombre;
+		String apellido1;
+		String apellido2;
+		String password = crearContraseñas();
 
+		email = cuenta.textFieldEmail.getText();
+		nombre = cuenta.textFieldNombre.getText();
+		apellido1 = cuenta.textFieldApellido1.getText();
+		apellido2 = cuenta.textFieldApellido2.getText();
+
+		AlumnoBBDD a = new AlumnoBBDD(email, nombre, apellido1, apellido2);
+
+		if (modelo.insertarAlumno(a, password)) {
+			cuenta.dispose();
+		} else {
+			JOptionPane.showMessageDialog(view, "Hubo algun error al crear el usuario", "ERROR",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private String crearContraseñas() {
-		Password c = new Password();
+		Password p = new Password();
 
-		return c.generarPassword(c.MAYUSCULAS + c.MINUSCULAS + c.NUMEROS + c.SIMBOLOS, 8);
+		return p.generarPassword(p.MAYUSCULAS + p.MINUSCULAS + p.NUMEROS + p.SIMBOLOS, 8);
 	}
 
 	private void cerrarSesion() {
@@ -236,9 +253,10 @@ public class controladorPrincipal implements ActionListener {
 		} else if (comand.equals("cancelar login")) {
 			login.dispose();
 		} else if (comand.equals("crear cuenta")) {
+			login.dispose();
 			cargarCrearCuenta();
 		} else if (comand.equals("aceptar cuenta")) {
-
+			crearCuenta();
 		} else if (comand.equals("cancelar cuenta")) {
 
 		}

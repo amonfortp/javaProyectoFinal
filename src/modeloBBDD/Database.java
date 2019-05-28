@@ -18,7 +18,7 @@ import configuracion.ConfiguracionSegura;
 
 /**
  * 
- * Explicacion de la clase
+ * Clase para gestionar las conexiones de la base de datos
  *
  * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
  *         </a>
@@ -35,8 +35,10 @@ public class Database {
 
 	private Connection conexion;
 
+	/**
+	 * Constructor de Database
+	 */
 	public Database() {
-
 		this.host = "127.0.0.1";
 		this.port = "3306";
 		this.database = "bbddProyecto";
@@ -130,16 +132,27 @@ public class Database {
 		return i;
 	}
 
-	protected boolean insert(String tabla, String columnas, int cantidadDatos, ArrayList<String> datos) {
-		boolean insertado = true;
+	protected boolean insert(String tabla, String columnas, ArrayList<String> datos) {
+		boolean insertado = false;
 
 		String caracteres = "";
 
-		for (int i = 0; i < cantidadDatos; i++) {
+		for (int i = 0; i < datos.size(); i++) {
 			caracteres += "?";
 		}
 
 		String insert = "INSERT INTO " + tabla + " (" + columnas + ") VALUES (" + caracteres + ") ";
+
+		try (Connection con = conectar(); PreparedStatement pstm = con.prepareStatement(insert);) {
+			for (int i = 1; i <= datos.size(); i++) {
+				pstm.setString(i, datos.get(i - 1));
+			}
+			pstm.execute();
+			insertado = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return insertado;
 	}

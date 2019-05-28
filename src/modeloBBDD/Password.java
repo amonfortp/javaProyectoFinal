@@ -4,6 +4,7 @@
 package modeloBBDD;
 
 /**
+ * 
  * Explicacion de la clase
  *
  * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
@@ -17,7 +18,7 @@ public class Password {
 	public static final String NUMEROS = "123456789";
 	public static final String SIMBOLOS = "$%&@#";
 
-	public final String generarPassword(String alfabeto, int tamaño) {
+	public String generarPassword(String alfabeto, int tamaño) {
 		String contraseña = "";
 
 		for (int i = 1; i < tamaño; i++) {
