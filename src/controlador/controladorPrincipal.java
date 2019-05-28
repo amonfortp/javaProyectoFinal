@@ -14,9 +14,11 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
 import modeloBBDD.Modelo;
+import modeloBBDD.Password;
 import modeloLDAP.LDAP;
 import modeloLDAP.Persona;
 import modeloLDAP.Profesor;
+import vista.JDCrearCuenta;
 import vista.JDLogin;
 import vista.JFramePrincipal;
 
@@ -33,6 +35,7 @@ public class controladorPrincipal implements ActionListener {
 	private JFramePrincipal view;
 	private Modelo modelo;
 	private JDLogin login;
+	private JDCrearCuenta cuenta;
 
 	/**
 	 * Constructor del controlador principal
@@ -94,9 +97,11 @@ public class controladorPrincipal implements ActionListener {
 		login = new JDLogin();
 		login.btnAceptar.setActionCommand("aceptar login");
 		login.btnCancelar.setActionCommand("cancelar login");
+		login.btnCrearCuenta.setActionCommand("crear cuenta");
 
 		login.btnAceptar.addActionListener(this);
 		login.btnCancelar.addActionListener(this);
+		login.btnCrearCuenta.addActionListener(this);
 
 		login.setVisible(true);
 	}
@@ -147,6 +152,10 @@ public class controladorPrincipal implements ActionListener {
 	private boolean comprobarBBDD(String login, String passwd) {
 		boolean b = false;
 
+		if (modelo.autentificar(login, passwd)) {
+			b = true;
+		}
+
 		return b;
 	}
 
@@ -161,6 +170,42 @@ public class controladorPrincipal implements ActionListener {
 		}
 
 		return abierto;
+	}
+
+	private void cargarCrearCuenta() {
+		cuenta = new JDCrearCuenta();
+		cuenta.btnAceptar.setActionCommand("aceptar cuenta");
+		cuenta.btnCancelar.setActionCommand("cancelar cuenta");
+
+		cuenta.btnAceptar.addActionListener(this);
+		cuenta.btnCancelar.addActionListener(this);
+
+		cuenta.setVisible(true);
+	}
+
+	private void crearCuenta() {
+
+	}
+
+	private String crearContraseñas() {
+		Password c = new Password();
+
+		return c.generarPassword(c.MAYUSCULAS + c.MINUSCULAS + c.NUMEROS + c.SIMBOLOS, 8);
+	}
+
+	private void cerrarSesion() {
+		int opcion = JOptionPane.YES_NO_OPTION;
+
+		if (opcion == JOptionPane.YES_OPTION) {
+			view.btnLogin.setVisible(true);
+			view.btnSalir.setEnabled(false);
+			view.btnReservas.setVisible(false);
+			view.btnPeriodos.setVisible(false);
+			view.btnConfiguracion.setVisible(false);
+			view.btnReservas.setEnabled(false);
+			view.btnPeriodos.setEnabled(false);
+			view.btnConfiguracion.setEnabled(false);
+		}
 	}
 
 	/**
@@ -185,11 +230,17 @@ public class controladorPrincipal implements ActionListener {
 		} else if (comand.equals("configuracion")) {
 
 		} else if (comand.equals("salir")) {
-
+			cerrarSesion();
 		} else if (comand.equals("aceptar login")) {
 			comprobarInicio();
 		} else if (comand.equals("cancelar login")) {
 			login.dispose();
+		} else if (comand.equals("crear cuenta")) {
+			cargarCrearCuenta();
+		} else if (comand.equals("aceptar cuenta")) {
+
+		} else if (comand.equals("cancelar cuenta")) {
+
 		}
 	}
 

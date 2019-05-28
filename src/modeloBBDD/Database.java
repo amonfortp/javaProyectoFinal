@@ -3,27 +3,28 @@
  */
 package modeloBBDD;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Date;
+
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.swing.JOptionPane;
 
 import configuracion.ConfiguracionSegura;
 
+/**
+ * 
+ * Explicacion de la clase
+ *
+ * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
+ *         </a>
+ *
+ * 
+ */
 public class Database {
 
 	private String host;
@@ -44,6 +45,11 @@ public class Database {
 
 	}
 
+	/**
+	 * 
+	 * Metodo para conectarnos con la base de datos
+	 * 
+	 */
 	public Connection conectar() {
 		conexion = null;
 		ConfiguracionSegura conf = new ConfiguracionSegura();
@@ -71,12 +77,71 @@ public class Database {
 		}
 	}
 
-	protected Map<Integer, ArrayList<Object>> select(String columnas, String tabla, String where) {
+	protected Map<Integer, ArrayList<Object>> select(String columnas, String tabla, String where, String id) {
 		Map<Integer, ArrayList<Object>> resultado = new LinkedHashMap<Integer, ArrayList<Object>>();
-		
-		
-		
+		ArrayList<Object> lista;
+
+		String select = "SELECT " + columnas + " FROM " + tabla;
+		if (where != null) {
+			select += " WHERE " + where;
+		}
+
+		try (Connection con = conectar();
+				Statement stm = con.createStatement();
+				ResultSet rs = stm.executeQuery(select)) {
+
+			int numColumnas = rs.getMetaData().getColumnCount();
+
+			while (rs.next()) {
+				lista = new ArrayList<Object>();
+				for (int i = 1; i <= numColumnas; i++) {
+					lista.add(rs.getObject(i));
+				}
+				resultado.put(rs.getInt(id), lista);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return resultado;
+	}
+
+	protected int contarAlumno(String login, String passwd) {
+		int i = 0;
+
+		String select = "SELECT Count(*) FROM Alumno WHERE email=? and password=PASSWORD(?)";
+
+		try (Connection con = conectar(); PreparedStatement pstm = con.prepareStatement(select)) {
+			pstm.setString(1, login);
+			pstm.setString(2, passwd);
+
+			ResultSet rs = pstm.executeQuery();
+
+			rs.next();
+
+			i = rs.getInt(1);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return i;
+	}
+
+	protected boolean insert(String tabla, String columnas, int cantidadDatos, ArrayList<String> datos) {
+		boolean insertado = true;
+
+		String caracteres = "";
+
+		for (int i = 0; i < cantidadDatos; i++) {
+			caracteres += "?";
+		}
+
+		String insert = "INSERT INTO " + tabla + " (" + columnas + ") VALUES (" + caracteres + ") ";
+
+		return insertado;
 	}
 
 }

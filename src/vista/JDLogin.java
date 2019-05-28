@@ -25,6 +25,7 @@ public class JDLogin extends JDialog {
 	public JButton btnCancelar;
 	public JTextField textFieldLogin;
 	public JPasswordField passwordField;
+	public JButton btnCrearCuenta;
 
 	/**
 	 * Launch the application.
@@ -62,7 +63,7 @@ public class JDLogin extends JDialog {
 		{
 			JPanel panel = new JPanel();
 			contentPanel.add(panel);
-			panel.setLayout(new MigLayout("", "[180.00,grow]", "[19px][][][][][]"));
+			panel.setLayout(new MigLayout("", "[180.00,grow]", "[19px][][][][][][][][]"));
 			{
 				JLabel lblUsuario = new JLabel("Usuario");
 				panel.add(lblUsuario, "cell 0 1,alignx left,aligny center");
@@ -79,6 +80,10 @@ public class JDLogin extends JDialog {
 			{
 				passwordField = new JPasswordField();
 				panel.add(passwordField, "cell 0 5,growx");
+			}
+			{
+				btnCrearCuenta = new JButton("Crear Cuenta");
+				panel.add(btnCrearCuenta, "cell 0 8,alignx center");
 			}
 		}
 		{
