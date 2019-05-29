@@ -132,18 +132,13 @@ public class Database {
 		return i;
 	}
 
-	protected boolean insert(String tabla, String columnas, ArrayList<String> datos) {
+	protected boolean insert(String tabla, String columnas, String caracteres, ArrayList<String> datos) {
 		boolean insertado = false;
-
-		String caracteres = "";
-
-		for (int i = 0; i < datos.size(); i++) {
-			caracteres += "?";
-		}
 
 		String insert = "INSERT INTO " + tabla + " (" + columnas + ") VALUES (" + caracteres + ") ";
 
 		try (Connection con = conectar(); PreparedStatement pstm = con.prepareStatement(insert);) {
+			System.out.println(insert);
 			for (int i = 1; i <= datos.size(); i++) {
 				pstm.setString(i, datos.get(i - 1));
 			}

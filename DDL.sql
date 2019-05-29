@@ -382,9 +382,10 @@ DELIMITER ;
 
 INSERT INTO Curso VALUES (2019);
 
-CALL crearPeriodo('2019-07-01', '2019-07-15', '12:30:00', '15:30:00', '00:30:00', 2019);
+CALL crearPeriodo('2019-07-01', '2019-07-15', '12:00:00', '15:00:00', '00:30:00', 2019);
 
 INSERT INTO Alumno VALUES ('amonfortp1@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
+INSERT INTO Alumno VALUES ('amonfortp2@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
 
 INSERT INTO Mensaje VALUES ('mensajeUsuarioCreado', 'Su usuario se a creado correctemente, su login y contraseña son: ');
 INSERT INTO Mensaje VALUES ('mensajeReservado', 'Ha realizado una reserva, a continuación vera un documento que debera guardar como confirmación y tiene un plazo de 24h para eliminarla.');

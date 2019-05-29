@@ -3,9 +3,11 @@
  */
 package modeloBBDD;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
-
-import com.lowagie.text.List;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 /**
  * 
@@ -61,7 +63,35 @@ public class Modelo extends Database {
 
 		String columnas = "email, nombre, apellido1, apellido2, password";
 
-		return insert("Alumno", columnas, datos);
+		String caracteres = "";
+
+		for (int i = 0; i < datos.size(); i++) {
+			if (i == datos.size() - 1) {
+				caracteres += "PASSWORD(?)";
+			} else {
+				caracteres += "?,";
+			}
+		}
+
+		return insert("Alumno", columnas, caracteres, datos);
+	}
+
+	public Map<Integer, LinkedHashSet<LocalDate>> dias() {
+
+		// SELECT distinct(dia), idPeriodo FROM Reserva WHERE dia>current_date() and
+		// email is null and idPeriodo in (SELECT idPeriodo FROM Periodo WHERE curso =
+		// YEAR(current_date()) and habilitado = TRUE);
+
+		return null;
+	}
+
+	public Map<Integer, LinkedHashSet<LocalTime>> horas() {
+
+		// SELECT distinct(hora), idPeriodo FROM Reserva WHERE email is null and
+		// idPeriodo in (SELECT idPeriodo FROM Periodo WHERE curso =
+		// YEAR(current_date()) and habilitado = TRUE);
+
+		return null;
 	}
 
 }

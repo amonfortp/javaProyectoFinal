@@ -21,7 +21,7 @@ public class Password {
 	public String generarPassword(String alfabeto, int tamaño) {
 		String contraseña = "";
 
-		for (int i = 1; i < tamaño; i++) {
+		for (int i = 0; i < tamaño; i++) {
 			contraseña += alfabeto.charAt((int) (Math.random() * alfabeto.length()));
 		}
 

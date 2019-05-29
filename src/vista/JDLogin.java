@@ -65,7 +65,7 @@ public class JDLogin extends JDialog {
 			contentPanel.add(panel);
 			panel.setLayout(new MigLayout("", "[180.00,grow]", "[19px][][][][][][][][]"));
 			{
-				JLabel lblUsuario = new JLabel("Usuario");
+				JLabel lblUsuario = new JLabel("Usuario (Correo Electronico)");
 				panel.add(lblUsuario, "cell 0 1,alignx left,aligny center");
 			}
 			{
