@@ -5,6 +5,7 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 
 import modeloBBDD.AlumnoBBDD;
 import modeloBBDD.Modelo;
@@ -18,7 +19,7 @@ import vista.JIReservar;
  *         </a>
  *
  */
-public class controladorReservar implements ActionListener {
+public class controladorReservas implements ActionListener {
 
 	private JIReservar JIR;
 	private Modelo modelo;
@@ -31,7 +32,7 @@ public class controladorReservar implements ActionListener {
 	 * @param modelo   es de la clase Modelo
 	 * @param a        objeto AlumnoBBDD
 	 */
-	public controladorReservar(JIReservar reservar, Modelo modelo, AlumnoBBDD a) {
+	public controladorReservas(JIReservar reservar, Modelo modelo, AlumnoBBDD a) {
 		super();
 		this.JIR = reservar;
 		this.modelo = modelo;
@@ -47,6 +48,23 @@ public class controladorReservar implements ActionListener {
 		JIR.btnCerrar.addActionListener(this);
 		JIR.btnEliminarReserva.addActionListener(this);
 		JIR.btnReservar.addActionListener(this);
+
+		cargarDias();
+	}
+
+	/**
+	 * Hace visible el JInternalFrame de las reservas
+	 */
+	public void start() {
+		JIR.setVisible(true);
+	}
+
+	private void cargarDias() {
+
+	}
+
+	private void cargarHoras(LocalDate dia) {
+
 	}
 
 	/*

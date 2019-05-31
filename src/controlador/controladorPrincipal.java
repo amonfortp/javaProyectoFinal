@@ -25,6 +25,7 @@ import modeloLDAP.Persona;
 import vista.JDCrearCuenta;
 import vista.JDLogin;
 import vista.JFramePrincipal;
+import vista.JIReservar;
 
 /**
  * Controlador del JFramePrincipal donde gestionar las llamadas de el resto de
@@ -40,7 +41,8 @@ public class controladorPrincipal implements ActionListener {
 	private Modelo modelo;
 	private JDLogin login;
 	private JDCrearCuenta cuenta;
-	private AlumnoBBDD a;
+	private JIReservar reserva;
+	private String email;
 
 	/**
 	 * Constructor del controlador principal
@@ -121,6 +123,7 @@ public class controladorPrincipal implements ActionListener {
 			view.btnSalir.setEnabled(true);
 			view.btnLogin.setVisible(false);
 			login.dispose();
+			email = l;
 		} else {
 			JOptionPane.showMessageDialog(view, "No existe el usuario, comprueba login o contraseña", "ERROR",
 					JOptionPane.ERROR_MESSAGE);
@@ -131,19 +134,24 @@ public class controladorPrincipal implements ActionListener {
 
 	private boolean comprobarLDAP(String login, String passwd) {
 		boolean b = false;
+		int i = 0;
 		ArrayList<Persona> profesores = new ArrayList<Persona>();
 		LDAP ldap = new LDAP();
 		profesores = ldap.memberOf("Docente");
 
 		if (ldap.autenticacionLDAP(login, passwd)) {
-			for (int i = 0; i < profesores.size(); i++) {
-				if (ldap.obtenerUsuarioLDAPByUID(profesores.get(i))) {
-					b = true;
+			while (i < profesores.size() && b == false) {
+				if (profesores.get(i).getUid().compareTo(login) == 0) {
+					if (ldap.search("cn=Docente,ou=groups", "memberUid=" + profesores.get(i).getUidNumber())) {
+						b = true;
+					}
 				}
+				i++;
 			}
 		}
 
 		return b;
+
 	}
 
 	private boolean comprobarBBDD(String login, String passwd) {
@@ -238,6 +246,16 @@ public class controladorPrincipal implements ActionListener {
 		GmailTool.sendHtml(to, from, subject, body);
 	}
 
+	private void abrirReserva() {
+		if (!estaAbierto(reserva)) {
+			reserva = new JIReservar();
+			AlumnoBBDD a = modelo.obtenerAlumno(email);
+			controladorReservas cr = new controladorReservas(reserva, modelo, a);
+			view.desktopPane.add(reserva);
+			cr.start();
+		}
+	}
+
 //	private void generarReportReserva(String email, String passwd) {
 //
 //		String reportUrl = "/reports/confirmacion.jasper";
@@ -290,7 +308,7 @@ public class controladorPrincipal implements ActionListener {
 		if (comand.equals("login")) {
 			cargarLogin();
 		} else if (comand.equals("reservas")) {
-
+			abrirReserva();
 		} else if (comand.equals("periodos")) {
 
 		} else if (comand.equals("configuracion")) {
