@@ -7,7 +7,12 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,15 +114,12 @@ public class controladorPrincipal implements ActionListener {
 		String l = login.textFieldLogin.getText();
 		String p = String.valueOf(login.passwordField.getPassword());
 
-		if (comprobarLDAP(l, p)) {
-			view.btnPeriodos.setVisible(true);
-			view.btnConfiguracion.setVisible(true);
-			view.btnPeriodos.setEnabled(true);
-			view.btnConfiguracion.setEnabled(true);
-			view.btnSalir.setEnabled(true);
-			view.btnLogin.setVisible(false);
-			login.dispose();
-		} else if (comprobarBBDD(l, p)) {
+		/*
+		 * if (comprobarLDAP(l, p)) { view.btnPeriodos.setVisible(true);
+		 * view.btnConfiguracion.setVisible(true); view.btnPeriodos.setEnabled(true);
+		 * view.btnConfiguracion.setEnabled(true); view.btnSalir.setEnabled(true);
+		 * view.btnLogin.setVisible(false); login.dispose(); } else
+		 */ if (comprobarBBDD(l, p)) {
 			view.btnReservas.setVisible(true);
 			view.btnReservas.setEnabled(true);
 			view.btnSalir.setEnabled(true);
@@ -248,34 +250,21 @@ public class controladorPrincipal implements ActionListener {
 
 	private void abrirReserva() {
 		if (!estaAbierto(reserva)) {
-			reserva = new JIReservar();
+
+			Map<LocalDate, LinkedHashSet<LocalTime>> dh = modelo.obtenerDiasHoras();
+			HashSet<LocalDate> reservas = new HashSet<LocalDate>();
+
+			for (LocalDate dia : dh.keySet()) {
+				reservas.add(dia);
+			}
+
+			reserva = new JIReservar(reservas);
 			AlumnoBBDD a = modelo.obtenerAlumno(email);
-			controladorReservas cr = new controladorReservas(reserva, modelo, a);
+			controladorReservas cr = new controladorReservas(reserva, modelo, a, dh);
 			view.desktopPane.add(reserva);
 			cr.start();
 		}
 	}
-
-//	private void generarReportReserva(String email, String passwd) {
-//
-//		String reportUrl = "/reports/confirmacion.jasper";
-//		InputStream reportFile = null;
-//
-//		reportFile = getClass().getResourceAsStream(reportUrl);
-//
-//		Map<String, Object> parametros = new HashMap<String, Object>();
-//		parametros.put("password", passwd);
-//		parametros.put("password", email);
-//
-//		try {
-//			JasperPrint print = JasperFillManager.fillReport(reportFile, parametros);
-//			JasperExportManager.exportReportToPdfFile(print, "confirmacion.pdf");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//	}
 
 	private void cerrarSesion() {
 		int opcion = JOptionPane.YES_NO_OPTION;

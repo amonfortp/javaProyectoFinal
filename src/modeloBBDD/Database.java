@@ -3,13 +3,17 @@
  */
 package modeloBBDD;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
-
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -115,7 +119,7 @@ public class Database {
 
 		String select = "SELECT Count(*) FROM Alumno WHERE email=? and password=PASSWORD(?)";
 
-		try (Connection con = conectar(); PreparedStatement pstm = con.prepareStatement(select)) {
+		try (Connection con = conectar(); PreparedStatement pstm = con.prepareStatement(select);) {
 			pstm.setString(1, login);
 			pstm.setString(2, passwd);
 
@@ -150,6 +154,26 @@ public class Database {
 		}
 
 		return insertado;
+	}
+
+	protected boolean callReservar(String email, LocalDate dia, LocalTime hora) {
+
+		String sql = "{CALL reservar (?,?,?)}";
+
+		try (Connection con = conectar(); CallableStatement cs = con.prepareCall(sql)) {
+			cs.setString(1, email);
+			cs.setDate(2, Date.valueOf(dia));
+			cs.setTime(3, Time.valueOf(hora));
+
+			cs.execute();
+
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return false;
 	}
 
 }

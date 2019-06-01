@@ -5,6 +5,7 @@ package modeloBBDD;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -136,6 +137,52 @@ public class Modelo extends Database {
 		}
 
 		return citas;
+	}
+
+	/**
+	 * 
+	 * Metodo para saber la reserva del alumno
+	 *
+	 * @param email email del Alumno
+	 *
+	 * @return Devuelve un string con el dia y la hora de la reserva
+	 */
+	public String obtenerReserva(String email) {
+		String reserva = null;
+
+		String sql = "SELECT dia, hora FROM Reserva WHERE email=?";
+
+		try (Connection con = conectar(); PreparedStatement stm = con.prepareStatement(sql);) {
+			stm.setString(1, email);
+
+			ResultSet rs = stm.executeQuery();
+
+			if (rs.next()) {
+				reserva = rs.getString(1) + " " + rs.getString(2);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return reserva;
+
+	}
+
+	/**
+	 * 
+	 * En este metodo pasaremos las variables para poder reservar una cita
+	 *
+	 * @param email email del Alumno
+	 * @param dia   LocalDate del dia que vamos a reservar
+	 * @param hora  LocalTime de la hora de la que queremos la cita
+	 *
+	 * @return Devuelve boolean siendo un true si se a realizado la reserva
+	 */
+	public boolean reservar(String email, LocalDate dia, LocalTime hora) {
+
+		return callReservar(email, dia, hora);
+
 	}
 
 }
