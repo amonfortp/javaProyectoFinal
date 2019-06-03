@@ -205,6 +205,8 @@ BEGIN
 
 	DECLARE exiteReservaUsuario INT DEFAULT 0;
     DECLARE existeReserva INT;
+    DECLARE DATOS VARCHAR(45);
+    
 
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN
@@ -213,6 +215,7 @@ BEGIN
 		ROLLBACK;
 	END;
 		
+	SET DATOS = concat(DATE_FORMAT(diaR, '%d %m %Y'),TIME_FORMAT(horaR, "%H %i %s"));
 	SELECT 	COUNT(dia)
 	INTO exiteReservaUsuario FROM Reserva
 	WHERE email = correo;
@@ -229,7 +232,7 @@ BEGIN
 	ELSEIF existeReserva = 0
     THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = date_format(diaR,'%d-%m-%Y'), MYSQL_ERRNO = 1002;
+		SET MESSAGE_TEXT = DATOS, MYSQL_ERRNO = 1002;
     ELSE
     			
 		UPDATE Reserva 
