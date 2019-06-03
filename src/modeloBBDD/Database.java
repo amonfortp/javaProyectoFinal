@@ -62,7 +62,7 @@ public class Database {
 
 		try {
 			conexion = DriverManager.getConnection(
-					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database + "?serverTimezone=UTC+11",
+					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database + "?serverTimezone=UTC",
 					conf.getUser(), conf.getPassword());
 			if (conexion != null) {
 				System.out.println("Conexion realizada con exito");
