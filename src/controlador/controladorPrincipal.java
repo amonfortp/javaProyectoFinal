@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -251,7 +252,7 @@ public class controladorPrincipal implements ActionListener {
 	private void abrirReserva() {
 		if (!estaAbierto(reserva)) {
 
-			Map<LocalDate, LinkedHashSet<LocalTime>> dh = modelo.obtenerDiasHoras();
+			Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras();
 			HashSet<LocalDate> reservas = new HashSet<LocalDate>();
 
 			for (LocalDate dia : dh.keySet()) {

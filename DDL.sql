@@ -174,9 +174,9 @@ WHERE
 	IF diaR = null
 	THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'No tiene ninguna reserva', MYSQL_ERRNO = 1001;
+		SET MESSAGE_TEXT = 'No tienes ninguna reserva', MYSQL_ERRNO = 1001;
 	END IF;
-	IF current_date() < adddate(diaR, interval 1 day)
+	IF current_date() > adddate(diaR, interval 1 day)
 	THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'No se puede eliminar la reserva cuando quedan menos de 24h para el dia', MYSQL_ERRNO = 1002;
@@ -203,7 +203,8 @@ DROP PROCEDURE IF EXISTS reservar @@
 CREATE PROCEDURE reservar(in correo varchar(45), in diaR DATE, in horaR TIME)
 BEGIN
 
-	DECLARE reser INT DEFAULT 0;
+	DECLARE exiteReservaUsuario INT DEFAULT 0;
+    DECLARE existeReserva INT;
 
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	BEGIN
@@ -212,45 +213,32 @@ BEGIN
 		ROLLBACK;
 	END;
 		
-	SELECT 
-		COUNT(dia)
-	INTO reser FROM
-		Reserva
-	WHERE
-		email = correo;
+	SELECT 	COUNT(dia)
+	INTO exiteReservaUsuario FROM Reserva
+	WHERE email = correo;
+        
+	SELECT 	count(dia)
+	INTO existeReserva FROM	Reserva
+	WHERE dia = diaR AND hora = horaR;
 		
 	
-		IF reser = 1
+		IF exiteReservaUsuario = 1
 	THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'Ya hay una reserva', MYSQL_ERRNO = 1001;
-	END IF;
-    
-    SET reser = 0;
-    
-	SELECT 
-		count(dia)
-	INTO reser FROM
-		Reserva
-	WHERE
-		dia = diaR AND hora = horaR;
-    
-    IF reser = 0
+		SET MESSAGE_TEXT = 'El usuario ya tiene una reserva', MYSQL_ERRNO = 1001;
+	ELSEIF existeReserva = 0
     THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'No existe el dia para reservar', MYSQL_ERRNO = 1002;
-    END IF;
-    
-	START TRANSACTION;
-		
+		SET MESSAGE_TEXT = date_format(diaR,'%d-%m-%Y'), MYSQL_ERRNO = 1002;
+    ELSE
+    			
 		UPDATE Reserva 
 		SET 
 			email = correo
 		WHERE
 			dia = diaR AND hora = horaR;
-
-	COMMIT;
 	
+	END IF;
 END@@
 
 DELIMITER ;
@@ -390,5 +378,5 @@ INSERT INTO Alumno VALUES ('amonfortparra@gmail.com', 'Alex', 'Monfort', 'Parra'
 INSERT INTO Mensaje VALUES ('mensajeUsuarioCreado', 'Su usuario se a creado correctemente, su login y contraseña son: ');
 INSERT INTO Mensaje VALUES ('mensajeReservado', 'Ha realizado una reserva, a continuación vera un documento que debera guardar como confirmación y tiene un plazo de 24h para eliminarla.');
 
--- CALL reservar('amonfortp1@ieslavereda.es', '2019-07-01', '12:30:00');
--- CALL anularReserva('amonfortp1@ieslavereda.es');
+CALL reservar('amonfortparra@gmail.com', '2019-07-01', '12:30:00');
+-- CALL anularReserva('amonfortparra@gmail.com');

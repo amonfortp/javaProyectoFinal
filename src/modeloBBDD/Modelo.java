@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * 
@@ -103,33 +104,35 @@ public class Modelo extends Database {
 
 	/**
 	 * 
-	 * Metodo para obtener los dias de reseras y las horas
+	 * Metodo para obtener los dias de reservas y las horas
 	 *
 	 * @return Devuelve un Map cuya clave sera un LocalDate y el valor sera un
-	 *         LinkedHashSet de LocalTime
+	 *         TreeSet de LocalTime
 	 */
-	public Map<LocalDate, LinkedHashSet<LocalTime>> obtenerDiasHoras() {
-		Map<LocalDate, LinkedHashSet<LocalTime>> citas = new LinkedHashMap<LocalDate, LinkedHashSet<LocalTime>>();
-		LinkedHashSet<LocalTime> lista = new LinkedHashSet<LocalTime>();
 
-		Date id = new Date(0);
+	public Map<LocalDate, TreeSet<LocalTime>> obtenerDiasHoras() {
+		Map<LocalDate, TreeSet<LocalTime>> citas = new LinkedHashMap<LocalDate, TreeSet<LocalTime>>();
+		TreeSet<LocalTime> lista = new TreeSet<LocalTime>();
 
-		String sql = "SELECT dia, hora FROM Reserva WHERE dia>current_date() "
-				+ "and email is null and idPeriodo in (SELECT idPeriodo FROM Periodo WHERE "
-				+ "curso = YEAR(current_date()) and habilitado = TRUE) ORDER BY dia, hora ASC;";
+		Date dia = new Date(0);
+		Date aux = new Date(0);
 
+		String sql = "SELECT dia, hora FROM Reserva WHERE dia>current_date() and email is null and idPeriodo in (SELECT idPeriodo FROM Periodo WHERE curso = YEAR(current_date()) and habilitado = TRUE) ORDER BY dia, hora ASC;";
 		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
 
 			while (rs.next()) {
-				if (rs.getDate(1) != id) {
-					id = rs.getDate(1);
-				}
-				System.out.println(rs.getTime(2));
-				lista.add(rs.getTime(2).toLocalTime());
+				dia = rs.getDate(1);
 
-				citas.remove(id.toLocalDate());
-				citas.put(id.toLocalDate(), lista);
+				if (!aux.equals(dia)) {
+					citas.put(aux.toLocalDate(), lista);
+					lista = new TreeSet<LocalTime>();
+					aux = dia;
+				}
+				lista.add(Time.valueOf(rs.getString(2)).toLocalTime());
+
 			}
+			citas.put(aux.toLocalDate(), lista);
+			citas.remove(Date.valueOf("1970-01-01").toLocalDate());
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -210,6 +213,18 @@ public class Modelo extends Database {
 
 		return null;
 
+	}
+
+	/**
+	 * 
+	 * Metodo para eliminar la reserva del alumno
+	 *
+	 * @param email correo del alumno
+	 *
+	 * @return Devulve booleano siendo true si se a eliminado la reserva
+	 */
+	public boolean eliminarReserva(String email) throws SQLException {
+		return callEliminarReserva(email);
 	}
 
 }

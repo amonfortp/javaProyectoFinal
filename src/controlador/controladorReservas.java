@@ -7,20 +7,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.ListIterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.swing.JOptionPane;
 
-import com.github.lgooddatepicker.components.DatePicker;
-import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.CalendarListener;
 import com.github.lgooddatepicker.zinternaltools.CalendarSelectionEvent;
 import com.github.lgooddatepicker.zinternaltools.YearMonthChangeEvent;
@@ -47,7 +44,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 	private JIReservar JIR;
 	private Modelo modelo;
 	private AlumnoBBDD a;
-	private Map<LocalDate, LinkedHashSet<LocalTime>> reservas;
+	private Map<LocalDate, TreeSet<LocalTime>> reservas;
 
 	/**
 	 * Constructor del controladorReservar
@@ -57,7 +54,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 	 * @param a        objeto AlumnoBBDD
 	 */
 	public controladorReservas(JIReservar reservar, Modelo modelo, AlumnoBBDD a,
-			Map<LocalDate, LinkedHashSet<LocalTime>> dh) {
+			Map<LocalDate, TreeSet<LocalTime>> dh) {
 		super();
 		this.JIR = reservar;
 		this.modelo = modelo;
@@ -78,7 +75,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		JIR.calendarioReservas.addCalendarListener(this);
 
 		if (modelo.obtenerReserva(a.getEmail()) == null) {
-			JIR.textFieldFecha.setText("No tienen aun ninguna cita");
+			JIR.textFieldFecha.setText("No tienes aun ninguna cita");
 		} else {
 			JIR.textFieldFecha.setText(modelo.obtenerReserva(a.getEmail()));
 			JIR.btnEliminarReserva.setEnabled(true);
@@ -99,6 +96,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		while (dias.hasNext()) {
 			JIR.comboBoxReservas.addItem(dias.next());
 		}
+
 	}
 
 	private void reservar() {
@@ -115,6 +113,8 @@ public class controladorReservas implements ActionListener, CalendarListener {
 			JOptionPane.showMessageDialog(null, "La reserva se realizo correctamente", "Info",
 					JOptionPane.INFORMATION_MESSAGE);
 			generarCorreoCuenta(email, dia, hora);
+		} else {
+			JOptionPane.showMessageDialog(null, "No se puede realizar la reserva", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -159,6 +159,24 @@ public class controladorReservas implements ActionListener, CalendarListener {
 
 	}
 
+	private void eliminar() {
+		try {
+			if (modelo.eliminarReserva(a.getEmail())) {
+				JOptionPane.showMessageDialog(null, "Se a eliminado tu cita", "Info", JOptionPane.INFORMATION_MESSAGE);
+				JIR.textFieldFecha.setText("No tienes aun ninguna cita");
+			} else {
+				JOptionPane.showMessageDialog(null, "No se a eliminado tu cita", "Info", JOptionPane.ERROR_MESSAGE);
+			}
+		} catch (SQLException e) {
+			if (e.getErrorCode() == 1001) {
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+			if (e.getErrorCode() == 1002) {
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -174,7 +192,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		if (comand.equals("cerrar")) {
 			JIR.dispose();
 		} else if (comand.equals("eliminar reserva")) {
-
+			eliminar();
 		} else if (comand.equals("reservar")) {
 			reservar();
 		}

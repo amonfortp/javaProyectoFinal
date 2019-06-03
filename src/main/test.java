@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 import configuracion.ConfiguracionSegura;
 import gmail.GmailTool;
@@ -86,7 +87,7 @@ public class test {
 
 		Modelo modelo = new Modelo();
 
-		Map<LocalDate, LinkedHashSet<LocalTime>> periodos = modelo.obtenerDiasHoras();
+		Map<LocalDate, TreeSet<LocalTime>> periodos = modelo.obtenerDiasHoras();
 
 		for (LocalDate key : periodos.keySet()) {
 			System.out.println(key);

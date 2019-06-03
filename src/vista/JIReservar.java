@@ -125,6 +125,10 @@ public class JIReservar extends JInternalFrame {
 				.addContainerGap()));
 		panel_2.setLayout(gl_panel_2);
 
+		/*
+		 * Opciones del calendario
+		 */
+
 		DatePickerSettings ds = new DatePickerSettings();
 		calendarioReservas = new CalendarPanel(ds);
 		ds.setVetoPolicy(new SampleDateVetoPolicy());

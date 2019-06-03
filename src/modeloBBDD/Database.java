@@ -62,7 +62,7 @@ public class Database {
 
 		try {
 			conexion = DriverManager.getConnection(
-					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database + "?serverTimezone=UTC",
+					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database + "?serverTimezone=UTC+11",
 					conf.getUser(), conf.getPassword());
 			if (conexion != null) {
 				System.out.println("Conexion realizada con exito");
@@ -158,9 +158,10 @@ public class Database {
 
 	protected boolean callReservar(String email, LocalDate dia, LocalTime hora) {
 
-		String sql = "{CALL reservar (?,?,?)}";
+		String sql = "{CALL reservar(?,?,?)}";
 
 		try (Connection con = conectar(); CallableStatement cs = con.prepareCall(sql)) {
+			System.out.println(email + " " + Date.valueOf(dia) + " " + hora);
 			cs.setString(1, email);
 			cs.setDate(2, Date.valueOf(dia));
 			cs.setTime(3, Time.valueOf(hora));
@@ -174,6 +175,25 @@ public class Database {
 		}
 
 		return false;
+	}
+
+	protected boolean callEliminarReserva(String email) {
+
+		String sql = "{CALL anularReserva(?)}";
+
+		try (Connection con = conectar(); CallableStatement cs = con.prepareCall(sql)) {
+			cs.setString(1, email);
+
+			cs.execute();
+
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return false;
+
 	}
 
 }
