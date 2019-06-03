@@ -5,14 +5,19 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.ListIterator;
 import java.util.Map;
+
+import javax.swing.JOptionPane;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
@@ -20,8 +25,13 @@ import com.github.lgooddatepicker.optionalusertools.CalendarListener;
 import com.github.lgooddatepicker.zinternaltools.CalendarSelectionEvent;
 import com.github.lgooddatepicker.zinternaltools.YearMonthChangeEvent;
 
+import configuracion.ConfiguracionSegura;
+import gmail.GmailTool;
 import modeloBBDD.AlumnoBBDD;
 import modeloBBDD.Modelo;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import vista.JIReservar;
 
 /**
@@ -71,6 +81,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 			JIR.textFieldFecha.setText("No tienen aun ninguna cita");
 		} else {
 			JIR.textFieldFecha.setText(modelo.obtenerReserva(a.getEmail()));
+			JIR.btnEliminarReserva.setEnabled(true);
 		}
 
 	}
@@ -92,34 +103,61 @@ public class controladorReservas implements ActionListener, CalendarListener {
 
 	private void reservar() {
 		String email;
-		LocalDate dia;
-		LocalTime hora;
+		LocalDate dia = null;
+		LocalTime hora = null;
 
 		email = a.getEmail();
 		dia = JIR.calendarioReservas.getSelectedDate();
 		hora = (LocalTime) JIR.comboBoxReservas.getSelectedItem();
+
+		if (modelo.reservar(email, dia, hora)) {
+			reservas = modelo.obtenerDiasHoras();
+			JOptionPane.showMessageDialog(null, "La reserva se realizo correctamente", "Info",
+					JOptionPane.INFORMATION_MESSAGE);
+			generarCorreoCuenta(email, dia, hora);
+		}
 	}
 
-//	private void generarReportReserva(String email, String passwd) {
-//
-//		String reportUrl = "/reports/confirmacion.jasper";
-//		InputStream reportFile = null;
-//
-//		reportFile = getClass().getResourceAsStream(reportUrl);
-//
-//		Map<String, Object> parametros = new HashMap<String, Object>();
-//		parametros.put("password", passwd);
-//		parametros.put("password", email);
-//
-//		try {
-//			JasperPrint print = JasperFillManager.fillReport(reportFile, parametros);
-//			JasperExportManager.exportReportToPdfFile(print, "confirmacion.pdf");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//	}
+	private void generarCorreoCuenta(String email, LocalDate dia, LocalTime hora) {
+
+		String to = email;
+
+		generarReportReserva(dia, hora);
+
+		ArrayList<File> files = new ArrayList<File>();
+		files.add(new File("Datos.pdf"));
+
+		String from = (new ConfiguracionSegura()).getMailFrom();
+		String subject = "Confirmación cuenta";
+		String body = "<h1>Informacion de la reserva</h1><p>Acontinuación se adjunta un documento "
+				+ "con la información de la reserva";
+
+		GmailTool.sendHtmlWithAttachment(to, from, subject, body, files);
+	}
+
+	private void generarReportReserva(LocalDate dia, LocalTime hora) {
+
+		String reportUrl = "/reports/Datos.jasper";
+		InputStream reportFile = null;
+
+		String mensaje = modelo.obtenerMensaje("mensajeReservado");
+
+		reportFile = getClass().getResourceAsStream(reportUrl);
+
+		Map<String, Object> parametros = new HashMap<String, Object>();
+		parametros.put("Mensaje", mensaje);
+		parametros.put("Dia", dia);
+		parametros.put("Hora", hora);
+
+		try {
+			JasperPrint print = JasperFillManager.fillReport(reportFile, parametros);
+			JasperExportManager.exportReportToPdfFile(print, "Datos.pdf");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -155,6 +193,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		// TODO Auto-generated method stub
 
 		cargarHoras(e.getNewDate());
+		JIR.btnReservar.setEnabled(true);
 
 	}
 

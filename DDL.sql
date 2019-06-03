@@ -176,7 +176,7 @@ WHERE
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'No tiene ninguna reserva', MYSQL_ERRNO = 1001;
 	END IF;
-	IF current_date() < adddate(diaR, interval 1 day) and current_time()<horaR
+	IF current_date() < adddate(diaR, interval 1 day)
 	THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'No se puede eliminar la reserva cuando quedan menos de 24h para el dia', MYSQL_ERRNO = 1002;
@@ -385,7 +385,7 @@ INSERT INTO Curso VALUES (2019);
 CALL crearPeriodo('2019-07-01', '2019-07-15', '12:00:00', '15:00:00', '00:30:00', 2019);
 
 INSERT INTO Alumno VALUES ('amonfortp1@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
-INSERT INTO Alumno VALUES ('amonfortp2@ieslavereda.es', 'Alejandro', 'Monfort', 'Parra', PASSWORD('1111'));
+INSERT INTO Alumno VALUES ('amonfortparra@gmail.com', 'Alex', 'Monfort', 'Parra', PASSWORD('1111'));
 
 INSERT INTO Mensaje VALUES ('mensajeUsuarioCreado', 'Su usuario se a creado correctemente, su login y contraseña son: ');
 INSERT INTO Mensaje VALUES ('mensajeReservado', 'Ha realizado una reserva, a continuación vera un documento que debera guardar como confirmación y tiene un plazo de 24h para eliminarla.');

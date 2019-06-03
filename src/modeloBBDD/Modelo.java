@@ -124,7 +124,7 @@ public class Modelo extends Database {
 				if (rs.getDate(1) != id) {
 					id = rs.getDate(1);
 				}
-
+				System.out.println(rs.getTime(2));
 				lista.add(rs.getTime(2).toLocalTime());
 
 				citas.remove(id.toLocalDate());
@@ -182,6 +182,33 @@ public class Modelo extends Database {
 	public boolean reservar(String email, LocalDate dia, LocalTime hora) {
 
 		return callReservar(email, dia, hora);
+
+	}
+
+	/**
+	 * 
+	 * Este metodo se utiliza para encontrar el mensaje que corresponde a cada tipo
+	 * de correo que enviamos
+	 *
+	 * @param tipoMensaje identificador en la base de datos para la tabla mensajes
+	 *
+	 * @return Devuelve un string con el mensaje
+	 */
+	public String obtenerMensaje(String tipoMensaje) {
+
+		String sql = "SELECT mensaje FROM Mensaje WHERE tipo LIKE " + tipoMensaje;
+
+		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
+
+			if (rs.next()) {
+				return rs.getString(1);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
 
 	}
 

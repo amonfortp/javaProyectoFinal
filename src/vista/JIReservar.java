@@ -88,6 +88,7 @@ public class JIReservar extends JInternalFrame {
 
 		comboBoxReservas = new JComboBox<LocalTime>();
 		btnReservar = new JButton("Reservar");
+		btnReservar.setEnabled(false);
 
 		textFieldFecha = new JTextField();
 		textFieldFecha.setEnabled(false);
@@ -96,6 +97,7 @@ public class JIReservar extends JInternalFrame {
 		JLabel lblTuReserva = new JLabel("Tu reserva");
 
 		btnEliminarReserva = new JButton("Eliminar Reserva");
+		btnEliminarReserva.setEnabled(false);
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup().addGap(56)
