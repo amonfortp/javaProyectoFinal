@@ -205,6 +205,7 @@ BEGIN
 
 	DECLARE exiteReservaUsuario INT DEFAULT 0;
     DECLARE existeReserva INT;
+    DECLARE yaReservado INT;
     DECLARE DATOS VARCHAR(45);
     
 
@@ -224,8 +225,11 @@ BEGIN
 	INTO existeReserva FROM	Reserva
 	WHERE dia = diaR AND hora = horaR;
 		
-	
-		IF exiteReservaUsuario = 1
+	SELECT count(*) 
+    INTO yaReservado FROM Reserva 
+    WHERE email IS NOT NULL;
+    
+	IF exiteReservaUsuario = 1
 	THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = 'El usuario ya tiene una reserva', MYSQL_ERRNO = 1001;
@@ -233,8 +237,11 @@ BEGIN
     THEN
 		SIGNAL SQLSTATE '45000'
 		SET MESSAGE_TEXT = DATOS, MYSQL_ERRNO = 1002;
-    ELSE
-    			
+    ELSEIF yaReservado = 1
+	THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Ya hay una reserva ese dia', MYSQL_ERRNO = 1003;
+	ELSE
 		UPDATE Reserva 
 		SET 
 			email = correo
