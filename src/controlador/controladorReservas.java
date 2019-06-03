@@ -112,6 +112,8 @@ public class controladorReservas implements ActionListener, CalendarListener {
 			reservas = modelo.obtenerDiasHoras();
 			JOptionPane.showMessageDialog(null, "La reserva se realizo correctamente", "Info",
 					JOptionPane.INFORMATION_MESSAGE);
+			JIR.textFieldFecha.setText(modelo.obtenerReserva(a.getEmail()));
+			JIR.btnEliminarReserva.setEnabled(true);
 			generarCorreoCuenta(email, dia, hora);
 		} else {
 			JOptionPane.showMessageDialog(null, "No se puede realizar la reserva", "Error", JOptionPane.ERROR_MESSAGE);
@@ -164,6 +166,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 			if (modelo.eliminarReserva(a.getEmail())) {
 				JOptionPane.showMessageDialog(null, "Se a eliminado tu cita", "Info", JOptionPane.INFORMATION_MESSAGE);
 				JIR.textFieldFecha.setText("No tienes aun ninguna cita");
+				JIR.btnEliminarReserva.setEnabled(false);
 			} else {
 				JOptionPane.showMessageDialog(null, "No se a eliminado tu cita", "Info", JOptionPane.ERROR_MESSAGE);
 			}

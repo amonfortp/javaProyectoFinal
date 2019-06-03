@@ -62,7 +62,8 @@ public class Database {
 
 		try {
 			conexion = DriverManager.getConnection(
-					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database + "?serverTimezone=UTC",
+					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database
+							+ "?useLegacyDatetimeCode=false&serverTimezone=Europe/Madrid",
 					conf.getUser(), conf.getPassword());
 			if (conexion != null) {
 				System.out.println("Conexion realizada con exito");
@@ -72,15 +73,6 @@ public class Database {
 		}
 
 		return conexion;
-	}
-
-	protected void desconectar() {
-		try {
-			conexion.close();
-			System.out.println("Se a desconectado");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	protected Map<Integer, ArrayList<Object>> select(String columnas, String tabla, String where, String id) {

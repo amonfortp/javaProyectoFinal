@@ -199,7 +199,7 @@ public class Modelo extends Database {
 	 */
 	public String obtenerMensaje(String tipoMensaje) {
 
-		String sql = "SELECT mensaje FROM Mensaje WHERE tipo LIKE " + tipoMensaje;
+		String sql = "SELECT mensaje FROM Mensaje WHERE tipo LIKE '" + tipoMensaje+"'";
 
 		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
 
