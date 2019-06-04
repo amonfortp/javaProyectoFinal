@@ -31,6 +31,7 @@ import modeloLDAP.Persona;
 import vista.JDCrearCuenta;
 import vista.JDLogin;
 import vista.JFramePrincipal;
+import vista.JIFConfiguracion;
 import vista.JIReservar;
 
 /**
@@ -48,6 +49,7 @@ public class controladorPrincipal implements ActionListener {
 	private JDLogin login;
 	private JDCrearCuenta cuenta;
 	private JIReservar reserva;
+	private JIFConfiguracion configuracion;
 	private String email;
 
 	/**
@@ -115,12 +117,15 @@ public class controladorPrincipal implements ActionListener {
 		String l = login.textFieldLogin.getText();
 		String p = String.valueOf(login.passwordField.getPassword());
 
-		/*
-		 * if (comprobarLDAP(l, p)) { view.btnPeriodos.setVisible(true);
-		 * view.btnConfiguracion.setVisible(true); view.btnPeriodos.setEnabled(true);
-		 * view.btnConfiguracion.setEnabled(true); view.btnSalir.setEnabled(true);
-		 * view.btnLogin.setVisible(false); login.dispose(); } else
-		 */ if (comprobarBBDD(l, p)) {
+		if (comprobarLDAP(l, p)) {
+			view.btnPeriodos.setVisible(true);
+			view.btnConfiguracion.setVisible(true);
+			view.btnPeriodos.setEnabled(true);
+			view.btnConfiguracion.setEnabled(true);
+			view.btnSalir.setEnabled(true);
+			view.btnLogin.setVisible(false);
+			login.dispose();
+		} else if (comprobarBBDD(l, p)) {
 			view.btnReservas.setVisible(true);
 			view.btnReservas.setEnabled(true);
 			view.btnSalir.setEnabled(true);
@@ -267,6 +272,18 @@ public class controladorPrincipal implements ActionListener {
 		}
 	}
 
+	private void abrirConfiguracion() {
+		// TODO Auto-generated method stub
+
+		if (!estaAbierto(configuracion)) {
+			configuracion = new JIFConfiguracion();
+			controladorConf conf = new controladorConf(configuracion, modelo);
+			view.desktopPane.add(configuracion);
+			conf.start();
+		}
+
+	}
+
 	private void cerrarSesion() {
 		int opcion = JOptionPane.YES_NO_OPTION;
 
@@ -297,15 +314,31 @@ public class controladorPrincipal implements ActionListener {
 
 		if (comand.equals("login")) {
 			cargarLogin();
-		} else if (comand.equals("reservas")) {
+		}
+
+		// Alumno
+
+		else if (comand.equals("reservas")) {
 			abrirReserva();
-		} else if (comand.equals("periodos")) {
+		}
+
+		// Docente
+
+		else if (comand.equals("periodos")) {
 
 		} else if (comand.equals("configuracion")) {
+			abrirConfiguracion();
+		}
 
-		} else if (comand.equals("salir")) {
+		// Cerrar sesion
+
+		else if (comand.equals("salir")) {
 			cerrarSesion();
-		} else if (comand.equals("aceptar login")) {
+		}
+
+		// Login
+
+		else if (comand.equals("aceptar login")) {
 			comprobarInicio();
 		} else if (comand.equals("cancelar login")) {
 			login.dispose();
