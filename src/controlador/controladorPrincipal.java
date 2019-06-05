@@ -117,15 +117,16 @@ public class controladorPrincipal implements ActionListener {
 		String l = login.textFieldLogin.getText();
 		String p = String.valueOf(login.passwordField.getPassword());
 
-		if (comprobarLDAP(l, p)) {
-			view.btnPeriodos.setVisible(true);
-			view.btnConfiguracion.setVisible(true);
-			view.btnPeriodos.setEnabled(true);
-			view.btnConfiguracion.setEnabled(true);
-			view.btnSalir.setEnabled(true);
-			view.btnLogin.setVisible(false);
-			login.dispose();
-		} else if (comprobarBBDD(l, p)) {
+//		if (comprobarLDAP(l, p)) {
+//			view.btnPeriodos.setVisible(true);
+//			view.btnConfiguracion.setVisible(true);
+//			view.btnPeriodos.setEnabled(true);
+//			view.btnConfiguracion.setEnabled(true);
+//			view.btnSalir.setEnabled(true);
+//			view.btnLogin.setVisible(false);
+//			login.dispose();
+//		} else 
+		if (comprobarBBDD(l, p)) {
 			view.btnReservas.setVisible(true);
 			view.btnReservas.setEnabled(true);
 			view.btnSalir.setEnabled(true);
@@ -245,11 +246,14 @@ public class controladorPrincipal implements ActionListener {
 
 	private void generarCorreoCuenta(String email, String passwd) {
 
+		String mensaje = modelo.obtenerMensaje("mensajeUsuarioCreado");
+
 		String to = email;
 
 		String from = (new ConfiguracionSegura()).getMailFrom();
 		String subject = "Confirmación cuenta";
-		String body = "<h1>Información de la cuenta</h1><p>Email: " + email + "</p><p> Contraseña: " + passwd + "</p>";
+		String body = "<h1>Información de la cuenta</h1>" + "<p>" + mensaje + "</p>" + "<p>Email: " + email + "</p>"
+				+ "<p> Contraseña: " + passwd + "</p>";
 
 		GmailTool.sendHtml(to, from, subject, body);
 	}

@@ -131,7 +131,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 
 		String from = (new ConfiguracionSegura()).getMailFrom();
 		String subject = "Confirmación cuenta";
-		String body = "<h1>Informacion de la reserva</h1><p>Acontinuación se adjunta un documento "
+		String body = "<h1>Informacion de la reserva</h1><p>A continuación se adjunta un documento "
 				+ "con la información de la reserva";
 
 		GmailTool.sendHtmlWithAttachment(to, from, subject, body, files);
@@ -147,18 +147,17 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		reportFile = getClass().getResourceAsStream(reportUrl);
 
 		Map<String, Object> parametros = new HashMap<String, Object>();
-		parametros.put("Mensaje", mensaje);
-		parametros.put("Dia", dia);
-		parametros.put("Hora", hora);
-
+		parametros.put("Message", mensaje);
+		parametros.put("email", a.getEmail());
 		try {
-			JasperPrint print = JasperFillManager.fillReport(reportFile, parametros);
+			JasperPrint print = JasperFillManager.fillReport(reportFile, parametros, modelo.conectar());
+			System.out.println("PDF");
 			JasperExportManager.exportReportToPdfFile(print, "Datos.pdf");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+//new SimpleDateFormat("HH:mm:ss").format($F{hora})
 	}
 
 	private void eliminar() {
