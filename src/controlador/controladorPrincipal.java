@@ -32,7 +32,7 @@ import vista.JDCrearCuenta;
 import vista.JDLogin;
 import vista.JFramePrincipal;
 import vista.JIFConfiguracion;
-import vista.JIReservar;
+import vista.JIFReservar;
 
 /**
  * Controlador del JFramePrincipal donde gestionar las llamadas de el resto de
@@ -48,7 +48,7 @@ public class controladorPrincipal implements ActionListener {
 	private Modelo modelo;
 	private JDLogin login;
 	private JDCrearCuenta cuenta;
-	private JIReservar reserva;
+	private JIFReservar reserva;
 	private JIFConfiguracion configuracion;
 	private String email;
 
@@ -268,7 +268,7 @@ public class controladorPrincipal implements ActionListener {
 				reservas.add(dia);
 			}
 
-			reserva = new JIReservar(reservas);
+			reserva = new JIFReservar(reservas);
 			AlumnoBBDD a = modelo.obtenerAlumno(email);
 			controladorReservas cr = new controladorReservas(reserva, modelo, a, dh);
 			view.desktopPane.add(reserva);

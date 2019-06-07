@@ -29,10 +29,10 @@ import modeloBBDD.Modelo;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import vista.JIReservar;
+import vista.JIFReservar;
 
 /**
- * Controlador del JIReservar donde se controlara las acciones de los botones y
+ * Controlador del JIFReservar donde se controlara las acciones de los botones y
  * la gestion de cada reserva
  *
  * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
@@ -41,7 +41,7 @@ import vista.JIReservar;
  */
 public class controladorReservas implements ActionListener, CalendarListener {
 
-	private JIReservar JIR;
+	private JIFReservar JIR;
 	private Modelo modelo;
 	private AlumnoBBDD a;
 	private LocalDate dia;
@@ -52,10 +52,12 @@ public class controladorReservas implements ActionListener, CalendarListener {
 	 * Constructor del controladorReservar
 	 * 
 	 * @param reservar JInternalFrame de las reservas
-	 * @param modelo   es de la clase Modelo
-	 * @param a        objeto AlumnoBBDD
+	 * @param modelo   Es de la clase Modelo
+	 * @param a        Objeto AlumnoBBDD
+	 * @param dh       Map que contiene como key variables LocalDate y un TreeSet
+	 *                 formado por LocalTime
 	 */
-	public controladorReservas(JIReservar reservar, Modelo modelo, AlumnoBBDD a,
+	public controladorReservas(JIFReservar reservar, Modelo modelo, AlumnoBBDD a,
 			Map<LocalDate, TreeSet<LocalTime>> dh) {
 		super();
 		this.JIR = reservar;
@@ -64,10 +66,10 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		reservas = dh;
 		dia = null;
 		hora = null;
-		Iniciar();
+		iniciar();
 	}
 
-	private void Iniciar() {
+	private void iniciar() {
 		JIR.btnCerrar.setActionCommand("cerrar");
 		JIR.btnEliminarReserva.setActionCommand("eliminar reserva");
 		JIR.btnReservar.setActionCommand("reservar");

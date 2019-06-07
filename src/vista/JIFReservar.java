@@ -43,7 +43,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
  *         </a>
  *
  */
-public class JIReservar extends JInternalFrame {
+public class JIFReservar extends JInternalFrame {
 	public static HashSet<LocalDate> reservas;
 
 	public JButton btnReservar;
@@ -56,7 +56,7 @@ public class JIReservar extends JInternalFrame {
 	/**
 	 * Create the frame.
 	 */
-	public JIReservar(HashSet<LocalDate> reservas) {
+	public JIFReservar(HashSet<LocalDate> reservas) {
 		this.reservas = reservas;
 		setClosable(true);
 		setBounds(100, 100, 413, 580);
