@@ -44,6 +44,8 @@ public class controladorReservas implements ActionListener, CalendarListener {
 	private JIReservar JIR;
 	private Modelo modelo;
 	private AlumnoBBDD a;
+	private LocalDate dia;
+	private LocalTime hora;
 	private Map<LocalDate, TreeSet<LocalTime>> reservas;
 
 	/**
@@ -60,6 +62,8 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		this.modelo = modelo;
 		this.a = a;
 		reservas = dh;
+		dia = null;
+		hora = null;
 		Iniciar();
 	}
 
@@ -101,8 +105,6 @@ public class controladorReservas implements ActionListener, CalendarListener {
 
 	private void reservar() {
 		String email;
-		LocalDate dia = null;
-		LocalTime hora = null;
 
 		email = a.getEmail();
 		dia = JIR.calendarioReservas.getSelectedDate();
@@ -114,32 +116,32 @@ public class controladorReservas implements ActionListener, CalendarListener {
 					JOptionPane.INFORMATION_MESSAGE);
 			JIR.textFieldFecha.setText(modelo.obtenerReserva(a.getEmail()));
 			JIR.btnEliminarReserva.setEnabled(true);
-			generarCorreoCuenta(email, dia, hora);
+			generarCorreoReserva();
 		} else {
 			JOptionPane.showMessageDialog(null, "No se puede realizar la reserva", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
-	private void generarCorreoCuenta(String email, LocalDate dia, LocalTime hora) {
+	private void generarCorreoReserva() {
 
-		String to = email;
+		String to = a.getEmail();
 
-		generarReportReserva(dia, hora);
+		generarReportReserva();
 
 		ArrayList<File> files = new ArrayList<File>();
-		files.add(new File("Datos.pdf"));
+		files.add(new File("Reserva.pdf"));
 
 		String from = (new ConfiguracionSegura()).getMailFrom();
-		String subject = "Confirmación cuenta";
+		String subject = "Confirmación Reserva";
 		String body = "<h1>Informacion de la reserva</h1><p>A continuación se adjunta un documento "
-				+ "con la información de la reserva";
+				+ "con la información de la reserva</p>";
 
 		GmailTool.sendHtmlWithAttachment(to, from, subject, body, files);
 	}
 
-	private void generarReportReserva(LocalDate dia, LocalTime hora) {
+	private void generarReportReserva() {
 
-		String reportUrl = "/reports/Datos.jasper";
+		String reportUrl = "/reports/Reserva.jasper";
 		InputStream reportFile = null;
 
 		String mensaje = modelo.obtenerMensaje("mensajeReservado");
@@ -152,18 +154,21 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		try {
 			JasperPrint print = JasperFillManager.fillReport(reportFile, parametros, modelo.conectar());
 			System.out.println("PDF");
-			JasperExportManager.exportReportToPdfFile(print, "Datos.pdf");
+			JasperExportManager.exportReportToPdfFile(print, "Reserva.pdf");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//new SimpleDateFormat("HH:mm:ss").format($F{hora})
+
 	}
 
 	private void eliminar() {
 		try {
 			if (modelo.eliminarReserva(a.getEmail())) {
 				JOptionPane.showMessageDialog(null, "Se a eliminado tu cita", "Info", JOptionPane.INFORMATION_MESSAGE);
+				generarCorreoAnularReserva(dia, hora);
+				dia = null;
+				hora = null;
 				JIR.textFieldFecha.setText("No tienes aun ninguna cita");
 				JIR.btnEliminarReserva.setEnabled(false);
 			} else {
@@ -177,6 +182,19 @@ public class controladorReservas implements ActionListener, CalendarListener {
 				JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+
+	private void generarCorreoAnularReserva(LocalDate dia, LocalTime hora) {
+
+		String mensaje = modelo.obtenerMensaje("mensajeReservadoAnulado");
+
+		String to = a.getEmail();
+
+		String from = (new ConfiguracionSegura()).getMailFrom();
+		String subject = "Anulación Reserva";
+		String body = "<h1>Anulación de la Reserva</h1><p>" + mensaje + "</p> <p>" + dia + "  " + hora + "</p>";
+
+		GmailTool.sendHtml(to, from, subject, body);
 	}
 
 	/*

@@ -65,6 +65,7 @@ public class Database {
 					"jdbc:mysql://" + conf.getHost() + ":" + conf.getPort() + "/" + database
 							+ "?useLegacyDatetimeCode=false&serverTimezone=Europe/Madrid",
 					conf.getUser(), conf.getPassword());
+
 			if (conexion != null) {
 				System.out.println("Conexion realizada con exito");
 			}

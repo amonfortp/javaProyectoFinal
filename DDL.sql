@@ -387,7 +387,7 @@ INSERT INTO Alumno VALUES ('amonfortparra@gmail.com', 'Alex', 'Monfort', 'Parra'
 
 INSERT INTO Mensaje VALUES ('mensajeUsuarioCreado', 'Su usuario se a creado correctemente, su login y contraseña son: ');
 INSERT INTO Mensaje VALUES ('mensajeReservado', 'En este documento se explicara todos los documentos que se debe traer el dia de la reserva.');
-INSERT INTO Mensaje VALUES ('mensajeReservadoAnulado', 'Se a eliminado su reserva del dia: ');
+INSERT INTO Mensaje VALUES ('mensajeReservadoAnulado', 'Se a eliminado su reserva del dia y hora: ');
 
 CALL reservar('amonfortparra@gmail.com', '2019-07-01', '12:30:00');
 -- CALL anularReserva('amonfortparra@gmail.com');
