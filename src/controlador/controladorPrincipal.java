@@ -32,6 +32,7 @@ import vista.JDCrearCuenta;
 import vista.JDLogin;
 import vista.JFramePrincipal;
 import vista.JIFConfiguracion;
+import vista.JIFPeriodos;
 import vista.JIFReservar;
 
 /**
@@ -49,6 +50,7 @@ public class controladorPrincipal implements ActionListener {
 	private JDLogin login;
 	private JDCrearCuenta cuenta;
 	private JIFReservar reserva;
+	private JIFPeriodos periodo;
 	private JIFConfiguracion configuracion;
 	private String email;
 
@@ -117,16 +119,15 @@ public class controladorPrincipal implements ActionListener {
 		String l = login.textFieldLogin.getText();
 		String p = String.valueOf(login.passwordField.getPassword());
 
-//		if (comprobarLDAP(l, p)) {
-//			view.btnPeriodos.setVisible(true);
-//			view.btnConfiguracion.setVisible(true);
-//			view.btnPeriodos.setEnabled(true);
-//			view.btnConfiguracion.setEnabled(true);
-//			view.btnSalir.setEnabled(true);
-//			view.btnLogin.setVisible(false);
-//			login.dispose();
-//		} else 
-		if (comprobarBBDD(l, p)) {
+		if (comprobarLDAP(l, p)) {
+			view.btnPeriodos.setVisible(true);
+			view.btnConfiguracion.setVisible(true);
+			view.btnPeriodos.setEnabled(true);
+			view.btnConfiguracion.setEnabled(true);
+			view.btnSalir.setEnabled(true);
+			view.btnLogin.setVisible(false);
+			login.dispose();
+		} else if (comprobarBBDD(l, p)) {
 			view.btnReservas.setVisible(true);
 			view.btnReservas.setEnabled(true);
 			view.btnSalir.setEnabled(true);
@@ -288,6 +289,22 @@ public class controladorPrincipal implements ActionListener {
 
 	}
 
+	private void abrirPeriodos() {
+		if (!estaAbierto(periodo)) {
+			Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras();
+			HashSet<LocalDate> reservas = new HashSet<LocalDate>();
+
+			for (LocalDate dia : dh.keySet()) {
+				reservas.add(dia);
+			}
+
+			periodo = new JIFPeriodos(reservas);
+			controladorPeriodos cp = new controladorPeriodos(periodo, modelo);
+			view.desktopPane.add(periodo);
+			cp.start();
+		}
+	}
+
 	private void cerrarSesion() {
 		int opcion = JOptionPane.YES_NO_OPTION;
 
@@ -329,7 +346,7 @@ public class controladorPrincipal implements ActionListener {
 		// Docente
 
 		else if (comand.equals("periodos")) {
-
+			abrirPeriodos();
 		} else if (comand.equals("configuracion")) {
 			abrirConfiguracion();
 		}

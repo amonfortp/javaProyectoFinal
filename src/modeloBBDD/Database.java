@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import configuracion.ConfiguracionSegura;
 
 /**
@@ -164,7 +166,7 @@ public class Database {
 			return true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
 		}
 
 		return false;
@@ -189,4 +191,26 @@ public class Database {
 
 	}
 
+	protected boolean callCrearPeriodo(Periodo p) {
+
+		String sql = "{CALL crearPeriodo(?,?,?,?,?,?)}";
+
+		try (Connection con = conectar(); CallableStatement cs = con.prepareCall(sql)) {
+			cs.setDate(1, Date.valueOf(p.getDiaInicio()));
+			cs.setDate(2, Date.valueOf(p.getDiaFinal()));
+			cs.setTime(3, Time.valueOf(p.getHoraInicio()));
+			cs.setTime(4, Time.valueOf(p.getHoraFinal()));
+			cs.setTime(5, Time.valueOf(p.getTiempo()));
+			cs.setInt(6, p.getCurso());
+
+			cs.execute();
+
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+
+		return false;
+	}
 }

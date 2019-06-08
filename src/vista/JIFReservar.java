@@ -132,6 +132,7 @@ public class JIFReservar extends JInternalFrame {
 		DatePickerSettings ds = new DatePickerSettings();
 		calendarioReservas = new CalendarPanel(ds);
 		ds.setVetoPolicy(new SampleDateVetoPolicy());
+		ds.setHighlightPolicy(new SampleHighlightPolicy());
 
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(gl_panel.createParallelGroup(Alignment.LEADING)
@@ -150,6 +151,36 @@ public class JIFReservar extends JInternalFrame {
 		panel_1.add(btnCerrar);
 		getContentPane().setLayout(groupLayout);
 
+	}
+
+	private static class SampleHighlightPolicy implements DateHighlightPolicy {
+
+		/**
+		 * getHighlightInformationOrNull, Implement this function to indicate if a date
+		 * should be highlighted, and what highlighting details should be used for the
+		 * highlighted date.
+		 *
+		 * If a date should be highlighted, then return an instance of
+		 * HighlightInformation. If the date should not be highlighted, then return
+		 * null.
+		 *
+		 * You may (optionally) fill out the fields in the HighlightInformation class to
+		 * give any particular highlighted day a unique foreground color, background
+		 * color, or tooltip text. If the color fields are null, then the default
+		 * highlighting colors will be used. If the tooltip field is null (or empty),
+		 * then no tooltip will be displayed.
+		 *
+		 * Dates that are passed to this function will never be null.
+		 */
+		@Override
+		public HighlightInformation getHighlightInformationOrNull(LocalDate date) {
+			// Color rojo para los dias dentro de un periodo
+			if (reservas.contains(date)) {
+				return new HighlightInformation(Color.green, null, "Este dia puedes reservar cita");
+			}
+
+			return null;
+		}
 	}
 
 	private static class SampleDateVetoPolicy implements DateVetoPolicy {

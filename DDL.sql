@@ -296,7 +296,7 @@ INTO id FROM
     IF idCurso < year(current_date())
     THEN
 		SIGNAL SQLSTATE '45000'
-		SET MESSAGE_TEXT = 'El curso no puede ser anterior al actual', MYSQL_ERRNO = 1006;
+		SET MESSAGE_TEXT = 'El curso no puede ser anterior al año actual al actual', MYSQL_ERRNO = 1006;
     END IF; 
 		
 	START TRANSACTION;
@@ -378,7 +378,10 @@ END@@
 
 DELIMITER ;
 
+INSERT INTO Curso VALUES (2018);
 INSERT INTO Curso VALUES (2019);
+INSERT INTO Curso VALUES (2020);
+INSERT INTO Curso VALUES (2021);
 
 CALL crearPeriodo('2019-07-01', '2019-07-15', '12:00:00', '15:00:00', '00:30:00', 2019);
 

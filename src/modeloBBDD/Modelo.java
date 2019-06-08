@@ -12,11 +12,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * 
@@ -144,6 +140,29 @@ public class Modelo extends Database {
 
 	/**
 	 * 
+	 * Metodo para obtener todos los cursos que hay en la base de datos
+	 *
+	 *
+	 * @return Devuelve ArrayList<Integer> que contiene todos los cursos
+	 */
+	public ArrayList<Integer> obtenerCursos() {
+		ArrayList<Integer> cursos = new ArrayList<Integer>();
+
+		String sql = "SELECT curso FROM Curso";
+
+		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
+			while (rs.next()) {
+				cursos.add(rs.getInt(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return cursos;
+	}
+
+	/**
+	 * 
 	 * Metodo para saber la reserva del alumno
 	 *
 	 * @param email email del Alumno
@@ -217,14 +236,59 @@ public class Modelo extends Database {
 
 	/**
 	 * 
+	 * Metodo para obtener los Periodos segun su curso
+	 *
+	 * @param curso Variable int que se utilizara para identificar el curso
+	 *
+	 * @return Devolvera un Map con los periodos de cierto curso
+	 */
+	public Map<Integer, Periodo> obtenerPeriodos(int curso) {
+		Map<Integer, Periodo> periodos = new LinkedHashMap<Integer, Periodo>();
+
+		String sql = "SELECT idPeriodo, diaInicio, diaFinal, horaInicio, horaFinal, tiempo, habilitado FROM Periodo WHERE curso = "
+				+ curso;
+
+		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
+
+			while (rs.next()) {
+				Periodo p = new Periodo(rs.getInt(1), rs.getDate(2).toLocalDate(), rs.getDate(3).toLocalDate(),
+						rs.getTime(4).toLocalTime(), rs.getTime(5).toLocalTime(), rs.getTime(6).toLocalTime(), curso,
+						rs.getBoolean(7));
+
+				periodos.put(p.getId(), p);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return periodos;
+	}
+
+	/**
+	 * 
 	 * Metodo para eliminar la reserva del alumno
 	 *
 	 * @param email correo del alumno
 	 *
-	 * @return Devulve booleano siendo true si se a eliminado la reserva
+	 * @return Devuelve booleano siendo true si se a eliminado la reserva
 	 */
 	public boolean eliminarReserva(String email) throws SQLException {
 		return callEliminarReserva(email);
+	}
+
+	/**
+	 * 
+	 * Metodo que llama al metodo crearPeriodo
+	 *
+	 * @param periodo Objeto periodo que contiene los datos necesarios para utilizar
+	 *                en el metodo callCrearPeriodo para crear los periodos
+	 *
+	 * @return Devuelve boolean siendo true si se a creado el periodo
+	 */
+	public boolean crearPeriodo(Periodo periodo) {
+		return callCrearPeriodo(periodo);
 	}
 
 }

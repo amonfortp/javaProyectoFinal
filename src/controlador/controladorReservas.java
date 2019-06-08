@@ -119,8 +119,6 @@ public class controladorReservas implements ActionListener, CalendarListener {
 			JIR.textFieldFecha.setText(modelo.obtenerReserva(a.getEmail()));
 			JIR.btnEliminarReserva.setEnabled(true);
 			generarCorreoReserva();
-		} else {
-			JOptionPane.showMessageDialog(null, "No se puede realizar la reserva", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
