@@ -55,7 +55,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `bbddProyecto`.`Mensaje` (
   `tipo` VARCHAR(45) NOT NULL,
-  `mensaje` VARCHAR(150) NOT NULL,
+  `mensaje` VARCHAR(200) NOT NULL,
   PRIMARY KEY (`tipo`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;

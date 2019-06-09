@@ -7,6 +7,7 @@ import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -85,14 +86,14 @@ public class test {
 //
 //		System.out.println(c.generarPassword(c.MAYUSCULAS + c.NUMEROS + c.SIMBOLOS, 8));
 
-		Modelo modelo = new Modelo();
-
-		Map<LocalDate, TreeSet<LocalTime>> periodos = modelo.obtenerDiasHoras();
-
-		for (LocalDate key : periodos.keySet()) {
-			System.out.println(key);
-			System.out.println(periodos.get(key));
-		}
+//		Modelo modelo = new Modelo();
+//
+//		Map<LocalDate, TreeSet<LocalTime>> periodos = modelo.obtenerDiasHoras();
+//
+//		for (LocalDate key : periodos.keySet()) {
+//			System.out.println(key);
+//			System.out.println(periodos.get(key));
+//		}
 
 	}
 }

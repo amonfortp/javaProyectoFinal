@@ -30,6 +30,8 @@ import com.github.lgooddatepicker.optionalusertools.PickerUtilities;
 import com.github.lgooddatepicker.optionalusertools.TimeVetoPolicy;
 import com.github.lgooddatepicker.zinternaltools.HighlightInformation;
 
+import modeloBBDD.Mensaje;
+
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -49,13 +51,12 @@ import javax.swing.ListSelectionModel;
  */
 public class JIFPeriodos extends JInternalFrame {
 	public static HashSet<LocalDate> reservas;
-	public JTable tableReservas;
 	public JButton btnCrear;
 	public JButton btnCancelar;
 	public JComboBox comboBoxCurso1;
 	public JComboBox comboBoxPeriodos;
-	public JComboBox comboBoxMensajes;
-	public JTextPane textPane;
+	public JComboBox<Mensaje> comboBoxMensajes;
+	public JTextPane textPaneMensajes;
 	public JButton btnActualizar;
 	public JComboBox comboBoxCurso2;
 	public JButton btnEnabled;
@@ -63,6 +64,7 @@ public class JIFPeriodos extends JInternalFrame {
 	public DateTimePicker dateTimePickerFinal;
 	public JComboBox<LocalTime> comboBoxTiempo;
 	public JTable tablePeriodos;
+	public JTable tableReservas;
 
 	/**
 	 * Create the frame.
@@ -238,7 +240,7 @@ public class JIFPeriodos extends JInternalFrame {
 		JPanel Reservas = new JPanel();
 		tabbedPane.addTab("Reservas", null, Reservas, null);
 
-		JLabel lblCurso_1 = new JLabel("Curso");
+		JLabel lblPeriodo = new JLabel("Periodo");
 
 		comboBoxPeriodos = new JComboBox();
 
@@ -248,13 +250,13 @@ public class JIFPeriodos extends JInternalFrame {
 				.addGroup(gl_Reservas.createSequentialGroup().addContainerGap()
 						.addGroup(gl_Reservas.createParallelGroup(Alignment.LEADING)
 								.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
-								.addGroup(gl_Reservas.createSequentialGroup().addComponent(lblCurso_1)
+								.addGroup(gl_Reservas.createSequentialGroup().addComponent(lblPeriodo)
 										.addPreferredGap(ComponentPlacement.RELATED).addComponent(comboBoxPeriodos,
 												GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)))
 						.addContainerGap()));
 		gl_Reservas.setVerticalGroup(gl_Reservas.createParallelGroup(Alignment.LEADING).addGroup(gl_Reservas
 				.createSequentialGroup().addContainerGap()
-				.addGroup(gl_Reservas.createParallelGroup(Alignment.BASELINE).addComponent(lblCurso_1).addComponent(
+				.addGroup(gl_Reservas.createParallelGroup(Alignment.BASELINE).addComponent(lblPeriodo).addComponent(
 						comboBoxPeriodos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
 						GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.RELATED)
@@ -265,7 +267,7 @@ public class JIFPeriodos extends JInternalFrame {
 		panel_4.add(scrollPane_1, BorderLayout.CENTER);
 
 		tableReservas = new JTable();
-		panel_4.add(tableReservas, BorderLayout.NORTH);
+		scrollPane_1.setViewportView(tableReservas);
 		Reservas.setLayout(gl_Reservas);
 
 		JPanel Mensajes = new JPanel();
@@ -273,16 +275,16 @@ public class JIFPeriodos extends JInternalFrame {
 
 		JLabel lblMensaje = new JLabel("Mensaje");
 
-		comboBoxMensajes = new JComboBox();
+		comboBoxMensajes = new JComboBox<Mensaje>();
 
-		textPane = new JTextPane();
+		textPaneMensajes = new JTextPane();
 
 		btnActualizar = new JButton("Actualizar");
 		GroupLayout gl_Mensajes = new GroupLayout(Mensajes);
 		gl_Mensajes.setHorizontalGroup(gl_Mensajes.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_Mensajes.createSequentialGroup().addContainerGap()
 						.addGroup(gl_Mensajes.createParallelGroup(Alignment.LEADING)
-								.addComponent(textPane, GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+								.addComponent(textPaneMensajes, GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
 								.addGroup(gl_Mensajes.createSequentialGroup().addComponent(lblMensaje)
 										.addPreferredGap(ComponentPlacement.RELATED).addComponent(comboBoxMensajes,
 												GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE))
@@ -294,7 +296,7 @@ public class JIFPeriodos extends JInternalFrame {
 						comboBoxMensajes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
 						GroupLayout.PREFERRED_SIZE))
 				.addPreferredGap(ComponentPlacement.RELATED)
-				.addComponent(textPane, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+				.addComponent(textPaneMensajes, GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
 				.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnActualizar).addContainerGap()));
 		Mensajes.setLayout(gl_Mensajes);
 

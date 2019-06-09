@@ -31,6 +31,7 @@ import modeloLDAP.Persona;
 import vista.JDCrearCuenta;
 import vista.JDLogin;
 import vista.JFramePrincipal;
+import vista.JIFAbout;
 import vista.JIFConfiguracion;
 import vista.JIFPeriodos;
 import vista.JIFReservar;
@@ -52,6 +53,7 @@ public class controladorPrincipal implements ActionListener {
 	private JIFReservar reserva;
 	private JIFPeriodos periodo;
 	private JIFConfiguracion configuracion;
+	private JIFAbout about;
 	private String email;
 
 	/**
@@ -80,12 +82,14 @@ public class controladorPrincipal implements ActionListener {
 		view.btnPeriodos.setActionCommand("periodos");
 		view.btnConfiguracion.setActionCommand("configuracion");
 		view.btnSalir.setActionCommand("salir");
+		view.btnAbout.setActionCommand("about");
 
 		view.btnLogin.addActionListener(this);
 		view.btnReservas.addActionListener(this);
 		view.btnPeriodos.addActionListener(this);
 		view.btnConfiguracion.addActionListener(this);
 		view.btnSalir.addActionListener(this);
+		view.btnAbout.addActionListener(this);
 
 		view.btnReservas.setVisible(false);
 		view.btnPeriodos.setVisible(false);
@@ -262,7 +266,7 @@ public class controladorPrincipal implements ActionListener {
 	private void abrirReserva() {
 		if (!estaAbierto(reserva)) {
 
-			Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras();
+			Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras(true);
 			HashSet<LocalDate> reservas = new HashSet<LocalDate>();
 
 			for (LocalDate dia : dh.keySet()) {
@@ -291,7 +295,7 @@ public class controladorPrincipal implements ActionListener {
 
 	private void abrirPeriodos() {
 		if (!estaAbierto(periodo)) {
-			Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras();
+			Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras(false);
 			HashSet<LocalDate> reservas = new HashSet<LocalDate>();
 
 			for (LocalDate dia : dh.keySet()) {
@@ -317,6 +321,14 @@ public class controladorPrincipal implements ActionListener {
 			view.btnReservas.setEnabled(false);
 			view.btnPeriodos.setEnabled(false);
 			view.btnConfiguracion.setEnabled(false);
+		}
+	}
+
+	private void abrirAbout() {
+		if (!estaAbierto(about)) {
+			about = new JIFAbout();
+			view.desktopPane.add(about);
+			about.setVisible(true);
 		}
 	}
 
@@ -370,6 +382,8 @@ public class controladorPrincipal implements ActionListener {
 			crearCuenta();
 		} else if (comand.equals("cancelar cuenta")) {
 			cuenta.dispose();
+		} else if (comand.equals("about")) {
+			abrirAbout();
 		}
 	}
 

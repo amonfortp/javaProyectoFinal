@@ -9,8 +9,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -21,8 +23,10 @@ import javax.swing.table.TableCellEditor;
 
 import com.github.lgooddatepicker.components.TimePickerSettings.TimeIncrement;
 
+import modeloBBDD.Mensaje;
 import modeloBBDD.Modelo;
 import modeloBBDD.Periodo;
+import modeloBBDD.Reserva;
 import vista.JIFPeriodos;
 
 /**
@@ -35,19 +39,9 @@ import vista.JIFPeriodos;
  */
 public class controladorPeriodos implements ActionListener, MouseListener {
 
-	JIFPeriodos JIP;
-	Modelo modelo;
-
-	DefaultTableModel dtm = new DefaultTableModel(new String[] { "Periodo", "Dia de Inicio", "Dia Final", "Hora Inicio",
-			"Hora Final", "Tiempo", "Habilitado" }, 0) {
-
-		Class[] types = new Class[] { java.lang.String.class, java.lang.String.class, java.lang.String.class,
-				java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class };
-
-		public Class getColumnClass(int columnIndex) {
-			return types[columnIndex];
-		}
-	};
+	private JIFPeriodos JIP;
+	private Modelo modelo;
+	HashSet<Mensaje> mensajes;
 
 	/**
 	 * @param periodos JInternalFrame del administrador
@@ -83,7 +77,12 @@ public class controladorPeriodos implements ActionListener, MouseListener {
 
 		cargarCursos();
 		cargarTiempo();
-		cargarPeriodos();
+
+		cargarComboPeriodos();
+		cargarReservas();
+
+		cargarComboMensajes();
+		cargarMensajes();
 	}
 
 	/**
@@ -101,6 +100,10 @@ public class controladorPeriodos implements ActionListener, MouseListener {
 			JIP.comboBoxCurso1.addItem(cursos.get(i));
 			JIP.comboBoxCurso2.addItem(cursos.get(i));
 		}
+
+		JIP.comboBoxCurso1.setSelectedItem(Year.now().getValue());
+		JIP.comboBoxCurso2.setSelectedItem(Year.now().getValue());
+
 	}
 
 	private void cargarTiempo() {
@@ -145,34 +148,30 @@ public class controladorPeriodos implements ActionListener, MouseListener {
 				JOptionPane.showMessageDialog(null, "El periodo se a creado correctamente", "INFO",
 						JOptionPane.INFORMATION_MESSAGE);
 
-				Map<LocalDate, TreeSet<LocalTime>> dh = modelo.obtenerDiasHoras();
-				HashSet<LocalDate> reservas = new HashSet<LocalDate>();
-
-				for (LocalDate dia : dh.keySet()) {
-					reservas.add(dia);
-				}
-
-				JIP = new JIFPeriodos(reservas);
+				JIP.dispose();
 			}
 		} else {
 			JOptionPane.showMessageDialog(null, "Revisa que has seleccionado un dia de inicio y final", "ERROR",
 					JOptionPane.ERROR_MESSAGE);
 		}
+
 	}
 
 	private void cargarPeriodos() {
-		Map<Integer, Periodo> p = modelo.obtenerPeriodos((int) JIP.comboBoxCurso2.getSelectedItem());
+		Map<Integer, Periodo> p = modelo.obtenerPeriodoPorCurso((int) JIP.comboBoxCurso2.getSelectedItem());
+
+		DefaultTableModel dtm = new DefaultTableModel(new String[] { "Periodo", "Dia de Inicio", "Dia Final",
+				"Hora Inicio", "Hora Final", "Tiempo", "Habilitado" }, 0) {
+
+			Class[] types = new Class[] { java.lang.String.class, java.lang.String.class, java.lang.String.class,
+					java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class };
+
+			public Class getColumnClass(int columnIndex) {
+				return types[columnIndex];
+			}
+		};
 
 		if (!p.isEmpty()) {
-
-//			dtm.addColumn("Periodo");
-//			dtm.addColumn("Dia de Inicio");
-//			dtm.addColumn("Dia Final");
-//			dtm.addColumn("Hora Inicio");
-//			dtm.addColumn("Hora Final");
-//			dtm.addColumn("Tiempo");
-//			dtm.addColumn("Habilitado");
-
 			for (Integer key : p.keySet()) {
 				Object datos[] = new Object[7];
 
@@ -186,11 +185,122 @@ public class controladorPeriodos implements ActionListener, MouseListener {
 				dtm.addRow(datos);
 			}
 
-			JIP.tablePeriodos.setModel(dtm);
-			int anchos[] = { 1, 30, 30, 30, 30, 30, 1 };
-			for (int i = 0; i < JIP.tablePeriodos.getColumnCount(); i++) {
-				JIP.tablePeriodos.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+		}
+
+		JIP.tablePeriodos.setModel(dtm);
+		int anchos[] = { 1, 30, 30, 30, 30, 30, 1 };
+		for (int i = 0; i < JIP.tablePeriodos.getColumnCount(); i++) {
+			JIP.tablePeriodos.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+		}
+
+	}
+
+	private void habilitarPeriodo() {
+		int id;
+		boolean habilitado;
+		boolean exito = true;
+
+		if (JIP.tablePeriodos.getSelectedRows() != null) {
+			for (int i = 0; i < JIP.tablePeriodos.getSelectedRowCount(); i++) {
+				id = Integer.parseInt((String) JIP.tablePeriodos.getValueAt(JIP.tablePeriodos.getSelectedRows()[i], 0));
+				habilitado = (boolean) JIP.tablePeriodos.getValueAt(JIP.tablePeriodos.getSelectedRows()[i], 6);
+				if (habilitado == true) {
+					habilitado = false;
+				} else {
+					habilitado = true;
+				}
+				if (!modelo.cambiarHabilitado(id, habilitado)) {
+					exito = false;
+				}
+
 			}
+			if (exito == true) {
+				JOptionPane.showMessageDialog(null, "Algun periodo no se pudo deshabilitar", "ERROR",
+						JOptionPane.ERROR);
+			} else {
+				JOptionPane.showMessageDialog(null, "Se cambiaron todos los periodos seleccionados", "ERROR",
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Selecciona algun periodo", "ERROR", JOptionPane.ERROR);
+		}
+	}
+
+	private void cargarComboPeriodos() {
+		TreeSet p = modelo.obtenerPeriodos();
+		Iterator pIterator = p.iterator();
+
+		while (pIterator.hasNext()) {
+			JIP.comboBoxPeriodos.addItem(pIterator.next());
+		}
+	}
+
+	private void cargarReservas() {
+		Map<Integer, Reserva> r = modelo.obtenerReservas((int) JIP.comboBoxPeriodos.getSelectedItem());
+
+		DefaultTableModel dtm = new DefaultTableModel();
+		dtm.addColumn("DIA");
+		dtm.addColumn("HORA");
+		dtm.addColumn("EMAIL");
+
+		if (!r.isEmpty()) {
+			for (Integer key : r.keySet()) {
+				dtm.addRow(new String[] { String.valueOf(r.get(key).getDia()), String.valueOf(r.get(key).getHora()),
+						((r.get(key).getEmail() == null) ? "Sin reserva" : r.get(key).getEmail()) });
+
+			}
+
+		}
+
+		JIP.tableReservas.setModel(dtm);
+		int anchos[] = { 1, 1, 50 };
+		for (int i = 0; i < JIP.tableReservas.getColumnCount(); i++) {
+			JIP.tableReservas.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+		}
+	}
+
+	private void cargarComboMensajes() {
+		mensajes = modelo.obtenerMensajes();
+		Iterator<Mensaje> mIterator = mensajes.iterator();
+
+		JIP.comboBoxMensajes.removeAllItems();
+		while (mIterator.hasNext()) {
+			JIP.comboBoxMensajes.addItem(mIterator.next());
+		}
+
+	}
+
+	private void cargarMensajes() {
+		String mensaje = "";
+		Mensaje m;
+
+		Iterator<Mensaje> mIterator = mensajes.iterator();
+
+		while (mIterator.hasNext()) {
+			m = mIterator.next();
+			if (m.equals(JIP.comboBoxMensajes.getSelectedItem())) {
+				mensaje = m.getMensaje();
+			}
+		}
+
+		JIP.textPaneMensajes.setText(mensaje);
+
+	}
+
+	private void cambiarMensaje() {
+		if (JIP.textPaneMensajes.getText().length() <= 200) {
+			System.out.println(JIP.comboBoxMensajes.getSelectedItem().toString());
+			if (modelo.cambiarMensaje(JIP.comboBoxMensajes.getSelectedItem().toString(),
+					JIP.textPaneMensajes.getText())) {
+				JOptionPane.showMessageDialog(null, "Se cambio el mensaje correctamente", "Info",
+						JOptionPane.INFORMATION_MESSAGE);
+				cargarComboMensajes();
+			} else {
+				JOptionPane.showMessageDialog(null, "No se cambio el mensaje, hubo algun error", "ERROR",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "No puedes superar 200 caracteres", "ERROR", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -209,18 +319,21 @@ public class controladorPeriodos implements ActionListener, MouseListener {
 			JIP.dispose();
 		} else if (comand.equals("crear periodo")) {
 			crearPeriodo();
+			cargarPeriodos();
 		} else if (comand.equals("calcular tiempos")) {
 			calcularTiempos();
 		} else if (comand.equals("activar periodo")) {
-
+			habilitarPeriodo();
+			cargarPeriodos();
 		} else if (comand.equals("mostrar periodos")) {
 			cargarPeriodos();
 		} else if (comand.equals("mostrar reservas")) {
-
+			cargarReservas();
 		} else if (comand.equals("mostrar mensaje")) {
-
+			cargarMensajes();
 		} else if (comand.equals("actualizar mensaje")) {
-
+			cambiarMensaje();
+			cargarMensajes();
 		}
 
 	}

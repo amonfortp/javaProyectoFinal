@@ -106,14 +106,21 @@ public class Modelo extends Database {
 	 *         TreeSet de LocalTime
 	 */
 
-	public Map<LocalDate, TreeSet<LocalTime>> obtenerDiasHoras() {
+	public Map<LocalDate, TreeSet<LocalTime>> obtenerDiasHoras(boolean subSelect) {
 		Map<LocalDate, TreeSet<LocalTime>> citas = new LinkedHashMap<LocalDate, TreeSet<LocalTime>>();
 		TreeSet<LocalTime> lista = new TreeSet<LocalTime>();
+
+		String select = "";
+
+		if (subSelect == true) {
+			select = "and idPeriodo in (SELECT idPeriodo FROM Periodo WHERE curso = YEAR(current_date()) and habilitado = TRUE)";
+		}
 
 		Date dia = new Date(0);
 		Date aux = new Date(0);
 
-		String sql = "SELECT dia, hora FROM Reserva WHERE dia>current_date() and email is null and idPeriodo in (SELECT idPeriodo FROM Periodo WHERE curso = YEAR(current_date()) and habilitado = TRUE) ORDER BY dia, hora ASC;";
+		String sql = "SELECT dia, hora FROM Reserva WHERE dia>current_date() and email is null " + select
+				+ " ORDER BY dia, hora ASC;";
 		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
 
 			while (rs.next()) {
@@ -193,6 +200,33 @@ public class Modelo extends Database {
 
 	/**
 	 * 
+	 * Metodo para obtener las reservas por periodo
+	 *
+	 * @param periodo Integer del identificador del periodo
+	 *
+	 * @return Devuelve un Map con todas las reservas de un determinado periodo
+	 */
+	public Map<Integer, Reserva> obtenerReservas(int periodo) {
+		Map<Integer, Reserva> reservas = new LinkedHashMap<Integer, Reserva>();
+
+		String sql = "SELECT dia, hora, email FROM Reserva WHERE idPeriodo = " + periodo;
+		int i = 1;
+
+		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
+			while (rs.next()) {
+				Reserva r = new Reserva(rs.getDate(1).toLocalDate(), rs.getTime(2).toLocalTime(), rs.getString(3),
+						periodo);
+				reservas.put(i, r);
+				i++;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return reservas;
+	}
+
+	/**
+	 * 
 	 * En este metodo pasaremos las variables para poder reservar una cita
 	 *
 	 * @param email email del Alumno
@@ -242,7 +276,7 @@ public class Modelo extends Database {
 	 *
 	 * @return Devolvera un Map con los periodos de cierto curso
 	 */
-	public Map<Integer, Periodo> obtenerPeriodos(int curso) {
+	public Map<Integer, Periodo> obtenerPeriodoPorCurso(int curso) {
 		Map<Integer, Periodo> periodos = new LinkedHashMap<Integer, Periodo>();
 
 		String sql = "SELECT idPeriodo, diaInicio, diaFinal, horaInicio, horaFinal, tiempo, habilitado FROM Periodo WHERE curso = "
@@ -264,6 +298,112 @@ public class Modelo extends Database {
 		}
 
 		return periodos;
+	}
+
+	/**
+	 * 
+	 * Metodo para obtener los id de todos los periodos
+	 *
+	 * @return Devuelve TreeSet con los id de todos los periodos
+	 */
+	public TreeSet<Integer> obtenerPeriodos() {
+		TreeSet<Integer> p = new TreeSet<Integer>();
+		String sql = "SELECT idPeriodo FROM Periodo";
+
+		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
+
+			while (rs.next()) {
+				p.add(rs.getInt(1));
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return p;
+	}
+
+	/**
+	 * 
+	 * metodo para habilitar o deshabilitar un periodo
+	 *
+	 * @param id         Integer del id del periodo que vamos a actualizar
+	 * @param habilitado boolean para deshabilitar el periodo o no
+	 *
+	 * @return Devolvera un boleano en caso de haber des/habilitado correctamente o
+	 *         no
+	 */
+	public boolean cambiarHabilitado(int id, boolean habilitado) {
+		boolean exito = false;
+
+		String sql = "UPDATE Periodo SET habilitado = " + habilitado + " WHERE idPeriodo = " + id;
+
+		try (Connection con = conectar(); Statement stm = con.createStatement();) {
+			if (stm.execute(sql)) {
+				exito = true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return exito;
+	}
+
+	/**
+	 * 
+	 * Metodo para obtener todos los mensajes
+	 *
+	 * 
+	 * @return Devuelve los mensajes dentro de un HashSet
+	 */
+	public HashSet<Mensaje> obtenerMensajes() {
+		HashSet<Mensaje> mensajes = new HashSet<Mensaje>();
+
+		String sql = "SELECT tipo, mensaje FROM Mensaje";
+
+		try (Connection con = conectar(); Statement stm = con.createStatement(); ResultSet rs = stm.executeQuery(sql)) {
+
+			while (rs.next()) {
+				Mensaje m = new Mensaje(rs.getString(1), rs.getString(2));
+
+				mensajes.add(m);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return mensajes;
+	}
+
+	/**
+	 * 
+	 * Metodo para cambiar el mensaje
+	 *
+	 * @param tipo    String para identificar le mensaje que se va a cambiar
+	 * @param mensaje String con el nuevo mensaje
+	 *
+	 * @return Devuelve un booleano siendo tru si se a cambiado el mensaje
+	 */
+	public boolean cambiarMensaje(String tipo, String mensaje) {
+		boolean exito = false;
+
+		String sql = "UPDATE Mensaje SET mensaje = '" + mensaje + "' WHERE tipo = '" + tipo + "'";
+
+		try (Connection con = conectar(); Statement stm = con.createStatement();) {
+
+			stm.execute(sql);
+			exito = true;
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return exito;
 	}
 
 	/**

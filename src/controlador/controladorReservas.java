@@ -113,7 +113,7 @@ public class controladorReservas implements ActionListener, CalendarListener {
 		hora = (LocalTime) JIR.comboBoxReservas.getSelectedItem();
 
 		if (modelo.reservar(email, dia, hora)) {
-			reservas = modelo.obtenerDiasHoras();
+			reservas = modelo.obtenerDiasHoras(true);
 			JOptionPane.showMessageDialog(null, "La reserva se realizo correctamente", "Info",
 					JOptionPane.INFORMATION_MESSAGE);
 			JIR.textFieldFecha.setText(modelo.obtenerReserva(a.getEmail()));

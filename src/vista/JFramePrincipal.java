@@ -24,6 +24,7 @@ public class JFramePrincipal extends JFrame {
 	public JButton btnConfiguracion;
 	public JDesktopPane desktopPane;
 	public JButton btnSalir;
+	public JButton btnAbout;
 
 	/**
 	 * Launch the application.
@@ -83,6 +84,10 @@ public class JFramePrincipal extends JFrame {
 		btnSalir.setEnabled(false);
 		btnSalir.setIcon(new ImageIcon(JFramePrincipal.class.getResource("/images/Logout.png")));
 		toolBar.add(btnSalir);
+		
+		btnAbout = new JButton("About");
+		btnAbout.setIcon(new ImageIcon(JFramePrincipal.class.getResource("/images/usuarios.png")));
+		toolBar.add(btnAbout);
 
 		JPanel Visual = new JPanel();
 		contentPane.add(Visual, BorderLayout.CENTER);
