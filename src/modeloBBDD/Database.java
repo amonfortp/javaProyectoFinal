@@ -57,6 +57,7 @@ public class Database {
 	 * 
 	 * Metodo para conectarnos con la base de datos
 	 * 
+	 * @return Devuelve una conexion a la base de datos
 	 */
 	public Connection conectar() {
 		conexion = null;

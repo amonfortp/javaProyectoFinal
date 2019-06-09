@@ -25,14 +25,14 @@ public class Periodo {
 	private boolean habilitado;
 
 	/**
-	 * @param id
-	 * @param diaInicio
-	 * @param diaFinal
-	 * @param horaInicio
-	 * @param horaFinal
-	 * @param tiempo
-	 * @param curso
-	 * @param habilitado
+	 * @param id Integer del id del periodo
+	 * @param diaInicio DATE del dia del inicio del periodo
+	 * @param diaFinal DATE del dia final del periodo
+	 * @param horaInicio TIME de la hora de inicio
+	 * @param horaFinal TIME de la hora final
+	 * @param tiempo TIME del tiempo que dura cada reserva
+	 * @param curso Integer que representa el curso
+	 * @param habilitado BOOLEAN siendo true si esta habilitado
 	 */
 	public Periodo(int id, LocalDate diaInicio, LocalDate diaFinal, LocalTime horaInicio, LocalTime horaFinal,
 			LocalTime tiempo, int curso, boolean habilitado) {

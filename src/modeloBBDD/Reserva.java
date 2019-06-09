@@ -20,10 +20,10 @@ public class Reserva {
 	private int idPeriodo;
 
 	/**
-	 * @param dia
-	 * @param hora
-	 * @param email
-	 * @param idPeriodo
+	 * @param dia       DATE del dia de la reserva
+	 * @param hora      TIME de la hora de la reserva
+	 * @param email     String del email de la reserva
+	 * @param idPeriodo Integer del id del periodo
 	 */
 	public Reserva(LocalDate dia, LocalTime hora, String email, int idPeriodo) {
 		super();

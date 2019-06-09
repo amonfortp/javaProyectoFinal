@@ -13,7 +13,7 @@ import modeloBBDD.Modelo;
 import vista.JIFConfiguracion;
 
 /**
- * Explicacion de la clase
+ * controlador de la vista de configuracion
  *
  * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
  *         </a>
@@ -25,8 +25,8 @@ public class controladorConf implements ActionListener {
 	private Modelo modelo;
 
 	/**
-	 * @param conf   JIF
-	 * @param modelo
+	 * @param conf   JIFConfiguracion
+	 * @param modelo Modelo
 	 */
 	public controladorConf(JIFConfiguracion conf, Modelo modelo) {
 		super();

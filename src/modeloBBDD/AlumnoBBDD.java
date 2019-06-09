@@ -18,11 +18,11 @@ public class AlumnoBBDD {
 	private String apellido2;
 
 	/**
-	 * @param email
-	 * @param nombre
-	 * @param apellido1
-	 * @param apellido2
-	 * @param password
+	 * @param email String que contiene el email del alumno
+	 * @param nombre String del nombre del alumno
+	 * @param apellido1 String del primer apellido
+	 * @param apellido2 String del segundo apellido
+	 * @param password string de las contraseña del alumno
 	 */
 	public AlumnoBBDD(String email, String nombre, String apellido1, String apellido2) {
 		super();

@@ -15,8 +15,8 @@ public class Mensaje {
 	private String mensaje;
 
 	/**
-	 * @param tipo
-	 * @param mensaje
+	 * @param tipo    String con el tipo de mensaje
+	 * @param mensaje String con el contenido del mensaje
 	 */
 	public Mensaje(String tipo, String mensaje) {
 		super();

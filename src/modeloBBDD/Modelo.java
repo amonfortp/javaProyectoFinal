@@ -36,6 +36,7 @@ public class Modelo extends Database {
 	 *
 	 * @param login    login del usuario a validar
 	 * @param password password del usuario a validar
+	 * 
 	 * @return devuelve si hubo exito en autentificar o no
 	 */
 	public boolean autentificar(String login, String passwd) {
@@ -105,7 +106,6 @@ public class Modelo extends Database {
 	 * @return Devuelve un Map cuya clave sera un LocalDate y el valor sera un
 	 *         TreeSet de LocalTime
 	 */
-
 	public Map<LocalDate, TreeSet<LocalTime>> obtenerDiasHoras(boolean subSelect) {
 		Map<LocalDate, TreeSet<LocalTime>> citas = new LinkedHashMap<LocalDate, TreeSet<LocalTime>>();
 		TreeSet<LocalTime> lista = new TreeSet<LocalTime>();

@@ -45,7 +45,7 @@ public class controladorPeriodos implements ActionListener, MouseListener {
 
 	/**
 	 * @param periodos JInternalFrame del administrador
-	 * @param modelo
+	 * @param modelo   Modelo
 	 */
 	public controladorPeriodos(JIFPeriodos periodos, Modelo modelo) {
 		super();

@@ -207,7 +207,7 @@ public class controladorPrincipal implements ActionListener {
 		String nombre;
 		String apellido1;
 		String apellido2;
-		String password = crearContraseñas();
+		String password = crearPassword();
 
 		email = cuenta.textFieldEmail.getText();
 		nombre = cuenta.textFieldNombre.getText();
@@ -233,7 +233,7 @@ public class controladorPrincipal implements ActionListener {
 		}
 	}
 
-	private String crearContraseñas() {
+	private String crearPassword() {
 		Password p = new Password();
 
 		return p.generarPassword(p.MAYUSCULAS + p.MINUSCULAS + p.NUMEROS + p.SIMBOLOS, 8);

@@ -16,7 +16,7 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**
  * 
- * Explicacion de la clase
+ * Clase para gestionar la configuracion segura
  *
  * @author <a href="mailto:amonfortp1@ieslavereda.es">Alejandro Monfort Parra
  *         </a>
@@ -234,7 +234,7 @@ public class ConfiguracionSegura {
 			this.mailRefreshToken = decryptPropertyValue("mailRefreshToken");
 			this.applicationName = prop.getProperty("applicationName");
 			this.nameFrom = prop.getProperty("nameFrom");
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
